@@ -26,14 +26,15 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
             templateUrl: "views/main.html",
             data: { pageTitle: 'Example view' }
         })
-        .state('index.minor', {
-            url: "/minor",
-            templateUrl: "views/minor.html",
-            data: { pageTitle: 'Example view' }
+        .state('index.interest-over-time', {
+            url: "/interest-over-time",
+            templateUrl: "views/interest-over-time.html",
+            data: { pageTitle: 'Interes Over Time' },
+            controller: IOTController
         })
 }
 angular
-    .module('inspinia')
+    .module('watsonapp')
     .config(config)
     .run(function($rootScope, $state) {
         $rootScope.$state = $state;

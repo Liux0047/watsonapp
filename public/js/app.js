@@ -3,7 +3,7 @@
  *
  */
 (function () {
-    angular.module('inspinia', [
+    angular.module('watsonapp', [
         'ui.router',                    // Routing
         'oc.lazyLoad',                  // ocLazyLoad
         'ui.bootstrap',                 // Ui Bootstrap
