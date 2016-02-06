@@ -24,17 +24,17 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         .state('index.main', {
             url: "/main",
             templateUrl: "views/main.html",
-            data: {pageTitle: 'Example view'}
+            data: { pageTitle: 'Example view' }
         })
         .state('index.minor', {
             url: "/minor",
             templateUrl: "views/minor.html",
-            data: {pageTitle: 'Example view'}
+            data: { pageTitle: 'Example view' }
         })
 }
 angular
     .module('inspinia')
     .config(config)
-    .run(function ($rootScope, $state) {
+    .run(function($rootScope, $state) {
         $rootScope.$state = $state;
     });
