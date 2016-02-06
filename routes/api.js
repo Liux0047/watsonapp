@@ -13,23 +13,17 @@ var API_KEY_3 = 'ebd3a423e07ddaae345c6421485d36ff1a0ced11';
 var gateway = 'https://gateway-a.watsonplatform.net/calls/data/GetNews?outputMode=json&';
 
 /* GET api listing. */
-router.get('/keyword', function (req, res, next) {
-    var start = req.query.start;
-    var end = req.query.end;
-    var title = req.query.searchText;
-    var url = gateway + 'start=now-1d&end=now&q.enriched.url.title=' + title + '&' +
-        'return=enriched.url.title,enriched.url.entities.entity.text,enriched.url.entities.entity.type&' +
-        'apikey=' + API_KEY;
+router.get('/keywords', function (req, res, next) {
+    var options = {
+        start: req.query.start,
+        end: req.query.end,
+        title: req.query.searchText
+    };
 
-    https.get(url, function (httpsRes) {
-        console.log('Got response: ' + httpsRes.statusCode);
-        // consume response body
-        httpsRes.on('data', function (data) {
-            res.send(data);
-        });
-    }).on('error', function (e) {
-        console.log('Got error: ' + e.message);
-        res.send('Error');
+    var responseData = {};
+
+    doAjax(buildKeywordsUrl(options, API_KEY_1), function (result) {
+        res.json(result);
     });
 });
 
@@ -91,8 +85,16 @@ function buildIOTUrl(sentiment, options, apiKey) {
     return url;
 }
 
+function buildKeywordsUrl (options, apiKey){
+    var url = gateway + 'start=now-30d&end=now&q.enriched.url.entities.entity=|text=' + options.title + ',type=company|&' +
+        'return=enriched.url.entities.entity.text,enriched.url.entities.entity.sentiment.score,enriched.url.entities.entity.relevance&' +
+        'apikey=' + apiKey;
+    return url;
+}
+
 function sendIOTResponse(counter, threshold, res, responseData) {
     if (counter >= threshold) {
         res.json(responseData);
     }
 }
+

@@ -32,6 +32,12 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
             data: { pageTitle: 'Interes Over Time' },
             controller: IOTController
         })
+        .state('index.keywords', {
+            url: "/keywords",
+            templateUrl: "views/keywords.html",
+            data: { pageTitle: 'Related Keywords' },
+            controller: keywordsController
+        })
 }
 angular
     .module('watsonapp')
