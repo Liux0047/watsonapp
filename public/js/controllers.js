@@ -132,7 +132,7 @@ function getKeywords($http) {
 
             xAxis: {
                 title: {
-                    text: 'Sentiment'
+                    text: 'Timestamp'
                 }
             },
 
@@ -140,16 +140,17 @@ function getKeywords($http) {
                 startOnTick: false,
                 endOnTick: false,
                 title: {
-                    text: 'Times mentioned'
+                    text: 'Sentiment'
                 }
             },
 
             tooltip: {
                 useHTML: true,
                 headerFormat: '<table>',
-                pointFormat: '<tr><th>Sentiment:</th><td>{point.x}</td></tr>' +
-                '<tr><th>Mentioned:</th><td>{point.y} times</td></tr>' +
-                '<tr><th>Avg Relevance:</th><td>{point.z}</td></tr>',
+                pointFormat: '<tr><th>{point.name}</th></tr>' +
+                '<tr><th>Time:</th><td>{point.date}</td></tr>' +
+                '<tr><th>Sentiment:</th><td>{point.y} </td></tr>' +
+                '<tr><th>Relevance:</th><td>{point.z}</td></tr>',
                 footerFormat: '</table>',
                 followPointer: true
             },
@@ -184,21 +185,23 @@ function getKeywords($http) {
 }
 
 function processKeywordsData(rawResponse) {
-    rawResponse = rawResponse.result.docs;
+    var docs = rawResponse.result.docs;
     var keywordsWrapper = {};
-    for (var i = 0; i < rawResponse.length; i++) {
-        var entities = rawResponse[i].source.enriched.url.entities;
+    for (var i = 0; i < docs.length; i++) {
+        var entities = docs[i].source.enriched.url.entities;
         for (var j = 0; j < entities.length; j++){
             var entity = entities[j];
             if (typeof keywordsWrapper[entity.text] != 'undefined') {
                 keywordsWrapper[entity.text].count++;
                 keywordsWrapper[entity.text].relevance += entity.relevance;
                 keywordsWrapper[entity.text].sentimentScore += entity.sentiment.score;
+                keywordsWrapper[entity.text].timestamp += docs[i].timestamp;
             } else {
                 keywordsWrapper[entity.text] = {
                     count: 1,
                     relevance: entity.relevance,
-                    sentimentScore: entity.sentiment.score
+                    sentimentScore: entity.sentiment.score,
+                    timestamp: docs[i].timestamp
                 }
             }
         }
@@ -209,10 +212,11 @@ function processKeywordsData(rawResponse) {
         var keyword = keywordsWrapper[text];
         if (keyword.count > 0){
             result.push({
-                x: keyword.sentimentScore / keyword.count,
-                y: keyword.count,
-                z: keyword.relevance / keyword.count,
-                name: text
+                x: keyword.timestamp / keyword.count,
+                y: keyword.sentimentScore / keyword.count,
+                z: keyword.relevance,
+                name: text,
+                date: (new Date(keyword.timestamp)).toDateString()
             });
         }
     }
