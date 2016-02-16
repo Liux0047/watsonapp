@@ -14,7 +14,6 @@ function MainCtrl() {
 
 };
 
-
 angular
     .module('watsonapp')
     .controller('MainCtrl', MainCtrl);
@@ -31,11 +30,17 @@ function IOTController($scope, $http) {
 }
 
 function keywordsController($scope, $http) {
-    getKeywords($http);
+    var updateLinks = function (links) {
+        $scope.$apply(function () {
+            $scope.links = links;
+            console.log($scope.links);
+        });
+    }
+    getKeywords($http, updateLinks);
     $('#top-search').keyup(function (event) {
         if (event.keyCode == 13) {
             event.preventDefault();
-            getKeywords($http);
+            getKeywords($http, updateLinks);
         }
     });
 }
@@ -107,8 +112,10 @@ function getIOC($http) {
     }
 }
 
-function getKeywords($http) {
+function getKeywords($http, updateLinks) {
     var input = $('#top-search').val();
+    var keywordsWrapper = {};
+
     if (input.length) {
 
         var options = {
@@ -160,57 +167,75 @@ function getKeywords($http) {
                     dataLabels: {
                         enabled: true,
                         format: '{point.name}'
+                    },
+                    point: {
+                        events: {
+                            click: function () {
+                                updateLinks(keywordsWrapper[this.name].links);
+                                $('#myModal').modal('show');
+                            }
+                        }
                     }
                 }
             }
         };
 
         $http.get("/api/keywords?searchText=" + input)
-        //$http.get("/news.json")
+        //$http.get("/IBM.json")
             .then(function (response) {
                 options.series = [];
                 response = response.data;
                 if (response.status == "OK") {
-                    var data = processKeywordsData(response);
+                    var data = processKeywordsData(response, keywordsWrapper);
                     options.series.push({
                         data: data
                     });
                 }
-                console.debug(options.series.data);
-
                 $('#container').highcharts(options);
             });
     }
 
 }
 
-function processKeywordsData(rawResponse) {
+function processKeywordsData(rawResponse, keywordsWrapper) {
     var docs = rawResponse.result.docs;
-    var keywordsWrapper = {};
     for (var i = 0; i < docs.length; i++) {
-        var entities = docs[i].source.enriched.url.entities;
-        for (var j = 0; j < entities.length; j++){
-            var entity = entities[j];
-            if (typeof keywordsWrapper[entity.text] != 'undefined') {
-                keywordsWrapper[entity.text].count++;
-                keywordsWrapper[entity.text].relevance += entity.relevance;
-                keywordsWrapper[entity.text].sentimentScore += entity.sentiment.score;
-                keywordsWrapper[entity.text].timestamp += docs[i].timestamp;
-            } else {
-                keywordsWrapper[entity.text] = {
-                    count: 1,
-                    relevance: entity.relevance,
-                    sentimentScore: entity.sentiment.score,
-                    timestamp: docs[i].timestamp
+        var keywords = docs[i].source.enriched.url.keywords;
+        for (var j = 0; j < keywords.length; j++) {
+            var keyword = keywords[j];
+            if (keyword.relevance >= 0.9) {
+                if (typeof keywordsWrapper[keyword.text] != 'undefined') {
+                    keywordsWrapper[keyword.text].count++;
+                    keywordsWrapper[keyword.text].relevance += keyword.relevance;
+                    keywordsWrapper[keyword.text].sentimentScore += keyword.sentiment.score;
+                    keywordsWrapper[keyword.text].timestamp += docs[i].timestamp;
+                    keywordsWrapper[keyword.text].links.push(
+                        {
+                            title: docs[i].source.enriched.url.title,
+                            url: docs[i].source.enriched.url.url
+                        }
+                    );
+                } else {
+                    keywordsWrapper[keyword.text] = {
+                        count: 1,
+                        relevance: keyword.relevance,
+                        sentimentScore: keyword.sentiment.score,
+                        timestamp: docs[i].timestamp,
+                        links: [{
+                            title: docs[i].source.enriched.url.title,
+                            url: docs[i].source.enriched.url.url
+                        }]
+                    }
                 }
             }
+
         }
     }
 
     var result = [];
     for (var text in keywordsWrapper) {
         var keyword = keywordsWrapper[text];
-        if (keyword.count > 0){
+        if (keyword.count > 0) {
             result.push({
                 x: keyword.timestamp / keyword.count,
                 y: keyword.sentimentScore / keyword.count,
@@ -222,5 +247,4 @@ function processKeywordsData(rawResponse) {
     }
 
     return result;
-
 }

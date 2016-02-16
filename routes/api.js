@@ -17,12 +17,12 @@ router.get('/keywords', function (req, res, next) {
     var options = {
         start: req.query.start,
         end: req.query.end,
-        title: req.query.searchText
+        searchText: req.query.searchText
     };
 
     var responseData = {};
 
-    doAjax(buildKeywordsUrl(options, API_KEY_1), function (result) {
+    doAjax(buildKeywordsUrl(options, API_KEY_1, false), function (result) {
         res.json(result);
     });
 });
@@ -79,15 +79,18 @@ function doAjax(url, callback) {
 
 
 function buildIOTUrl(sentiment, options, apiKey) {
-    var url = gateway + 'start=now-30d&end=now&timeSlice=1d&q.enriched.url.entities.entity=|text=' + options.title + ',type=company|&' +
+    var url = gateway + 'start=now-30d&end=now&timeSlice=1d&q.enriched.url.entities.entity=|text=' + options.searchText + ',type=company|&' +
         '&q.enriched.url.enrichedTitle.docSentiment=|type=' + sentiment + '|&' +
         'apikey=' + apiKey;
     return url;
 }
 
-function buildKeywordsUrl (options, apiKey){
-    var url = gateway + 'start=now-30d&end=now&q.enriched.url.entities.entity=|text=' + options.title + ',type=company|&' +
-        'return=enriched.url.entities.entity.text,enriched.url.entities.entity.sentiment.score,enriched.url.entities.entity.relevance&' +
+function buildKeywordsUrl(options, apiKey, isTitleOnly) {
+    var enriched = isTitleOnly ? 'enriched.url.enrichedTitle.' : 'enriched.url.';
+    var returnParams = enriched + 'keywords.keyword.text,' + enriched + 'keywords.keyword.sentiment.score,' + enriched + 'keywords.keyword.relevance,' +
+        enriched + 'url,' + enriched + 'title';
+    var url = gateway + 'start=now-30d&end=now&q.' + enriched + 'entities.entity=|text=' + options.searchText + ',type=company|&' +
+        'return=' + returnParams + '&' +
         'apikey=' + apiKey;
     return url;
 }
