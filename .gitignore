@@ -36,3 +36,4 @@ node_modules
 public/bower_components
 
 .idea
+public/sample-data
