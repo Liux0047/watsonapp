@@ -24,24 +24,30 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         .state('index.main', {
             url: "/main",
             templateUrl: "views/main.html",
-            data: { pageTitle: 'Example view' }
+            data: {pageTitle: 'Example view'}
         })
         .state('index.interest-over-time', {
             url: "/interest-over-time",
             templateUrl: "views/interest-over-time.html",
-            data: { pageTitle: 'Interes Over Time' },
+            data: {pageTitle: 'Interes Over Time'},
             controller: IOTController
         })
         .state('index.keywords', {
             url: "/keywords",
             templateUrl: "views/keywords.html",
-            data: { pageTitle: 'Related Keywords' },
+            data: {pageTitle: 'Related Keywords'},
             controller: keywordsController
+        })
+        .state('index.relevant-correlations', {
+            url: "/relevant-correlations",
+            templateUrl: "views/relevant-correlations.html",
+            data: {pageTitle: 'Relevant Correlations'},
+            controller: relevantCorrelationsController
         })
 }
 angular
     .module('watsonapp')
     .config(config)
-    .run(function($rootScope, $state) {
+    .run(function ($rootScope, $state) {
         $rootScope.$state = $state;
     });

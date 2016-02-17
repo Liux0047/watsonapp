@@ -45,6 +45,17 @@ function keywordsController($scope, $http) {
     });
 }
 
+
+function relevantCorrelationsController($scope, $http) {
+    var input = $('#top-search').val();
+    if (input.length) {
+        $http.get("/api/relevant-correlations?searchText=" + input)
+            .then(function (response) {
+                console.log(response);
+            });
+    }
+}
+
 function getIOC($http) {
     var input = $('#top-search').val();
     if (input.length) {
@@ -181,7 +192,7 @@ function getKeywords($http, updateLinks) {
         };
 
         $http.get("/api/keywords?searchText=" + input)
-        //$http.get("/IBM.json")
+            //$http.get("/IBM.json")
             .then(function (response) {
                 options.series = [];
                 response = response.data;

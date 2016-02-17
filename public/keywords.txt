@@ -1,0 +1,15 @@
+BOJ
+Governor Haruhiko Kuroda
+Australia
+DailyForex
+USD/JPY
+Japan
+Japanese Yen
+Rob Mclennan
+U.S.
+BoJ
+Inflation Report
+central banks
+
+
+https://gateway-a.watsonplatform.net/calls/data/GetNews?outputMode=json&start=now-60d&end=now&q.enriched.url.enrichedTitle.entities.entity.text=boj&count=999999&return=enriched.url.enrichedTitle.entities.entity.text,enriched.url.enrichedTitle.entities.entity.sentiment.score&apikey=d2c38d1f5fe8ae7a528f8f01d1ca36c291e23282&
