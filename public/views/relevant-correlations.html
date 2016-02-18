@@ -5,6 +5,27 @@
                 <div id="container" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
             </div>
 
+            <table>
+                <thead>
+                <th>Entity name</th>
+                <th>Relevance</th>
+                <th>Sentiments</th>
+                </thead>
+                <tbody>
+                <tr ng-repeat="data in sentimentData">
+                    <td rowspan="{{data.sentimentData.length}}">{{data.text}}</td>
+                    <td rowspan="{{data.sentimentData.length}}">{{data.relevance}}</td>
+                    <td>
+                        <ul>
+                            <li ng-repeat="sentiment in data.sentimentScores">
+                                {{sentiment.timestamp}} : {{sentiment.score}}
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
         </div>
     </div>
 </div>

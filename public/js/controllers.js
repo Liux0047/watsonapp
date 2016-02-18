@@ -52,6 +52,8 @@ function relevantCorrelationsController($scope, $http) {
         $http.get("/api/relevant-correlations?searchText=" + input)
             .then(function (response) {
                 console.log(response);
+                $scope.sentimentData = response.data;
+
             });
     }
 }

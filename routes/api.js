@@ -13,7 +13,7 @@ var API_KEY_3 = 'ebd3a423e07ddaae345c6421485d36ff1a0ced11';
 var gateway = 'https://gateway-a.watsonplatform.net/calls/data/GetNews?outputMode=json&count=999999&';
 var enriched = 'enriched.url.';
 var enrichedTitle = 'enriched.url.enrichedTitle.';
-var RELEVANCE_THRESHOLD = 0.8;
+var RELEVANCE_THRESHOLD = 0.5;
 
 /* GET api listing. */
 router.get('/keywords', function (req, res, next) {
@@ -66,76 +66,43 @@ router.get('/relevant-correlations', function (req, res, next) {
         title: req.query.searchText
     };
 
-    var relevantEntities = {};
-    var sentimentsWrapper = {
-        sentiments: []
-    };
+    var entitiesWrapper = {};
 
     doAjax(buildRelevantEntitiesUrl(options, API_KEY_1), function (response) {
-        response = require('../public/sample-data/JPY-entity.json');
-        var docs = response.result.docs;
-        for (var i = 0; i < docs.length; i++) {
-            var entities = docs[i].source.enriched.url.entities;
-            for (var j = 0; j < entities.length; j++) {
-                var entity = entities[j];
-                if (entity.relevance > RELEVANCE_THRESHOLD) {
-                    console.log("Relevant entity found: " + entity.text);
-                    if (typeof relevantEntities[entity.text] != 'undefined') {
-                        relevantEntities[entity.text] += entity.relevance;
-                    } else {
-                        relevantEntities[entity.text] = entity.relevance;
-                    }
-                }
-            }
-        }
 
         var counter = 0;
-        for (var entityText in relevantEntities) {
-            doAjax(buildSentimentTrendUrl(encodeURIComponent(entityText), API_KEY_2), function (response, entityText) {
-                console.log("Querying for entity: " + entityText);
-                response = require('../public/sample-data/boj-sentiment.json');
-                if (response.status == 'OK') {
-                    var docs = response.result.docs;
-                    var sentimentScores = [];
-                    var currentTime = docs[0].timestamp;
-                    var score = 0;
-                    var date = 60;
-                    var numScoresThisDate = 0;
-                    for (var i = 0; i < docs.length; i++) {
-                        var entities = docs[i].source.enriched.url.enrichedTitle.entities;
+        response = require('../public/JPY-entity.json');
 
-                        for (var j = 0; j < entities.length; j++) {
-                            var entity = entities[j];
-                            if (entity.text == entityText) {
-                                score += entity.sentiment.score;
-                                numScoresThisDate++;
-                                if (currentTime - docs[i].timestamp >= 24 * 3600) {
+        if (response.status == 'OK') {
+            var docs = response.result.docs;
+            var sentimentScores = [];
+            for (var i = 0; i < docs.length; i++) {
+                var entities = docs[i].source.enriched.url.entities;
 
-                                    sentimentScores.push({
-                                        'date': date,
-                                        'score': entity.sentiment.score / numScoresThisDate
-                                    });
-
-                                    currentTime = docs[i].timestamp;
-                                    score = 0;
-                                    date--;
-                                    numScoresThisDate = 0;
-                                }
+                for (var j = 0; j < entities.length; j++) {
+                    var entity = entities[j];
+                    if (entity.relevance >= RELEVANCE_THRESHOLD) {
+                        if (typeof entitiesWrapper[entity.text] != 'undefined') {
+                            entitiesWrapper[entity.text].sentimentScores.push({
+                                'timestamp': docs[i].timestamp,
+                                'score': entity.sentiment.score
+                            });
+                            entitiesWrapper[entity.text].relevance += entity.relevance;
+                        } else {
+                            entitiesWrapper[entity.text] = {
+                                'text': entity.text,
+                                'sentimentScores': [{
+                                    'timestamp': docs[i].timestamp,
+                                    'score': entity.sentiment.score
+                                }],
+                                'relevance': entity.relevance
                             }
                         }
                     }
-                    sentimentsWrapper.sentiments.push({
-                        "entityText": entityText,
-                        "sentimentScores": sentimentScores,
-                        "relevance": relevantEntities[entityText]
-                    });
-                    console.log('Counter: ' + counter + ' of ' + Object.keys(relevantEntities).length + ': ' + entityText);
-                    if (++counter == Object.keys(relevantEntities).length) {
-                        res.json(sentimentsWrapper);
-                    }
-                }
 
-            }, entityText);
+                }
+            }
+            res.json(entitiesWrapper);
         }
     });
 });
@@ -186,13 +153,15 @@ function buildRelevantEntitiesUrl(options, apiKey) {
     return url;
 }
 
-function buildSentimentTrendUrl(entityText, apiKey) {
-    var url = gateway + 'start=now-60d&end=now' +
-        'q.' + enrichedTitle + 'entities.entity.text=' + entityText + '&' +
-        'return=' + enrichedTitle + 'entities.entity.text,' + enrichedTitle + 'entities.entity.sentiment.score&' +
-        'apikey=' + apiKey;
-    return url;
-}
+/*
+ function buildSentimentTrendUrl(entityText, apiKey) {
+ var url = gateway + 'start=now-60d&end=now' +
+ 'q.' + enrichedTitle + 'entities.entity.text=' + entityText + '&' +
+ 'return=' + enrichedTitle + 'entities.entity.text,' + enrichedTitle + 'entities.entity.sentiment.score&' +
+ 'apikey=' + apiKey;
+ return url;
+ }
+ */
 
 function sendIOTResponse(counter, threshold, res, responseData) {
     if (counter >= threshold) {
