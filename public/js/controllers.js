@@ -30,18 +30,23 @@ function IOTController($scope, $http) {
 }
 
 function keywordsController($scope, $http) {
+    $('.select2').select2();
+    $("input[id='range-in-days']").TouchSpin({
+        min: 1,
+        max: 60,
+        buttondown_class: 'btn btn-white',
+        buttonup_class: 'btn btn-white'
+
+    });
     var updateLinks = function (links) {
         $scope.$apply(function () {
             $scope.links = links;
             console.log($scope.links);
         });
     }
-    getKeywords($http, updateLinks);
-    $('#top-search').keyup(function (event) {
-        if (event.keyCode == 13) {
-            event.preventDefault();
-            getKeywords($http, updateLinks);
-        }
+    $('#keywords-search-btn').click(function (event) {
+        getKeywords($http, updateLinks);
+
     });
 }
 
@@ -126,10 +131,10 @@ function getIOC($http) {
 }
 
 function getKeywords($http, updateLinks) {
-    var input = $('#top-search').val();
+    var entityName = $('#entity-name').val();
     var keywordsWrapper = {};
 
-    if (input.length) {
+    if (entityName.length) {
 
         var options = {
             chart: {
@@ -193,19 +198,26 @@ function getKeywords($http, updateLinks) {
             }
         };
 
-        $http.get("/api/keywords?searchText=" + input)
-            //$http.get("/IBM.json")
-            .then(function (response) {
-                options.series = [];
-                response = response.data;
-                if (response.status == "OK") {
-                    var data = processKeywordsData(response, keywordsWrapper);
-                    options.series.push({
-                        data: data
-                    });
-                }
-                $('#container').highcharts(options);
-            });
+        $http({
+            method: 'GET',
+            url: '/api/keywords',
+            params: {
+                entityName: entityName,
+                entityType: $('#entity-type').val(),
+                rangeInDays: $('#range-in-days').val()
+            }
+        }).then(function (response) {
+            options.series = [];
+            response = response.data;
+            if (response.status == "OK") {
+                var data = processKeywordsData(response, keywordsWrapper);
+                options.series.push({
+                    data: data
+                });
+            }
+            $('#keywords-container').show();
+            $('#keywords-chart').highcharts(options);
+        });
     }
 
 }
@@ -213,44 +225,46 @@ function getKeywords($http, updateLinks) {
 function processKeywordsData(rawResponse, keywordsWrapper) {
     var docs = rawResponse.result.docs;
     for (var i = 0; i < docs.length; i++) {
-        var keywords = docs[i].source.enriched.url.keywords;
-        for (var j = 0; j < keywords.length; j++) {
-            var keyword = keywords[j];
-            if (keyword.relevance >= 0.9) {
-                if (typeof keywordsWrapper[keyword.text] != 'undefined') {
-                    keywordsWrapper[keyword.text].count++;
-                    keywordsWrapper[keyword.text].relevance += keyword.relevance;
-                    keywordsWrapper[keyword.text].sentimentScore += keyword.sentiment.score;
-                    keywordsWrapper[keyword.text].timestamp += docs[i].timestamp;
-                    keywordsWrapper[keyword.text].links.push(
-                        {
-                            title: docs[i].source.enriched.url.title,
-                            url: docs[i].source.enriched.url.url
+        if (Object.keys(docs[i].source).length) {
+            var keywords = docs[i].source.enriched.url.keywords;
+            for (var j = 0; j < keywords.length; j++) {
+                var keyword = keywords[j];
+                if (keyword.relevance >= 0.9) {
+                    if (typeof keywordsWrapper[keyword.text] != 'undefined') {
+                        keywordsWrapper[keyword.text].count++;
+                        keywordsWrapper[keyword.text].relevance += keyword.relevance;
+                        keywordsWrapper[keyword.text].sentimentScore += keyword.sentiment.score;
+                        keywordsWrapper[keyword.text].timestamp = docs[i].timestamp;
+                        keywordsWrapper[keyword.text].links.push(
+                            {
+                                title: docs[i].source.enriched.url.title,
+                                url: docs[i].source.enriched.url.url
+                            }
+                        );
+                    } else {
+                        keywordsWrapper[keyword.text] = {
+                            count: 1,
+                            relevance: keyword.relevance,
+                            sentimentScore: keyword.sentiment.score,
+                            timestamp: docs[i].timestamp,
+                            links: [{
+                                title: docs[i].source.enriched.url.title,
+                                url: docs[i].source.enriched.url.url
+                            }]
                         }
-                    );
-                } else {
-                    keywordsWrapper[keyword.text] = {
-                        count: 1,
-                        relevance: keyword.relevance,
-                        sentimentScore: keyword.sentiment.score,
-                        timestamp: docs[i].timestamp,
-                        links: [{
-                            title: docs[i].source.enriched.url.title,
-                            url: docs[i].source.enriched.url.url
-                        }]
                     }
                 }
-            }
 
+            }
         }
     }
 
     var result = [];
     for (var text in keywordsWrapper) {
         var keyword = keywordsWrapper[text];
-        if (keyword.count > 0) {
+        if (keyword.relevance > 3) {
             result.push({
-                x: keyword.timestamp / keyword.count,
+                x: ((new Date()).getTime() / 1000 - keyword.timestamp) / (24 * 3600),
                 y: keyword.sentimentScore / keyword.count,
                 z: keyword.relevance,
                 name: text,

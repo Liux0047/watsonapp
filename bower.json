@@ -19,7 +19,9 @@
     "oclazyload": "^1.0.9",
     "slimscroll": "^1.3.7",
     "jquery-ui": "^1.11.4",
-    "highcharts": "^4.2.2"
+    "highcharts": "^4.2.2",
+    "select2": "^4.0.1",
+    "bootstrap-touchspin": "^3.1.1"
   },
   "devDependencies": {
     "angular-mocks": "~1.3.4"

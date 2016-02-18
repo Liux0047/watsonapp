@@ -10,7 +10,9 @@ var API_KEY_1 = '3627a5a76ac122f8647f9f796e0e287b967417ab';
 var API_KEY_2 = 'd8f8c787d46a28787e2119fff692e863d020d7da';
 var API_KEY_3 = 'ebd3a423e07ddaae345c6421485d36ff1a0ced11';
 
-var gateway = 'https://gateway-a.watsonplatform.net/calls/data/GetNews?outputMode=json&count=999999&';
+
+var gateway = 'https://gateway-a.watsonplatform.net/calls/data/GetNews?outputMode=json&';
+var gatewayWithCount = gateway + 'count=999999&';
 var enriched = 'enriched.url.';
 var enrichedTitle = 'enriched.url.enrichedTitle.';
 var RELEVANCE_THRESHOLD = 0.5;
@@ -18,9 +20,9 @@ var RELEVANCE_THRESHOLD = 0.5;
 /* GET api listing. */
 router.get('/keywords', function (req, res, next) {
     var options = {
-        start: req.query.start,
-        end: req.query.end,
-        searchText: req.query.searchText
+        entityName: req.query.entityName,
+        entityType: req.query.entityType,
+        rangeInDays: req.query.rangeInDays
     };
 
     var responseData = {};
@@ -130,38 +132,33 @@ function doAjax(url, callback, callbackParams) {
 
 
 function buildIOTUrl(sentiment, options, apiKey) {
-    var url = gateway + 'start=now-30d&end=now&timeSlice=1d&q.enriched.url.entities.entity=|text=' + options.searchText + ',type=company|&' +
+    var url = gatewayWithCount + 'start=now-30d&end=now&timeSlice=1d&q.enriched.url.entities.entity=|text=' + options.searchText + ',type=company|&' +
         '&q.enriched.url.enrichedTitle.docSentiment=|type=' + sentiment + '|&' +
         'apikey=' + apiKey;
     return url;
 }
 
 function buildKeywordsUrl(options, apiKey) {
+    var type = '';
+    if (typeof options.entityType != 'undefined' && options.entityType.length){
+        type = ',type='+ options.entityType;
+    }
     var returnParams = enriched + 'keywords.keyword.text,' + enriched + 'keywords.keyword.sentiment.score,' + enriched + 'keywords.keyword.relevance,' +
         enriched + 'url,' + enriched + 'title';
-    var url = gateway + 'start=now-30d&end=now&q.' + enriched + 'entities.entity=|text=' + options.searchText + ',type=company|&' +
+    var url = gatewayWithCount + 'start=now-' + options.rangeInDays + 'd&end=now&q.' + enriched +
+        'entities.entity=|text=' + options.entityName + type + ',relevance=>0.6|&' +
         'return=' + returnParams + '&' +
-        'apikey=' + apiKey;
+        'dedup=1&apikey=' + apiKey;
     return url;
 }
 
 function buildRelevantEntitiesUrl(options, apiKey) {
-    var url = gateway + 'start=now-60d&end=now' +
+    var url = gatewayWithCount + 'start=now-60d&end=now' +
         'q.' + enrichedTitle + 'entities.entity.text=' + options.searchText + '&' +
         'return=' + enriched + 'entities.entity.text,' + enriched + 'entities.entity.relevance&' +
         'dedup=1&apikey=' + apiKey;
     return url;
 }
-
-/*
- function buildSentimentTrendUrl(entityText, apiKey) {
- var url = gateway + 'start=now-60d&end=now' +
- 'q.' + enrichedTitle + 'entities.entity.text=' + entityText + '&' +
- 'return=' + enrichedTitle + 'entities.entity.text,' + enrichedTitle + 'entities.entity.sentiment.score&' +
- 'apikey=' + apiKey;
- return url;
- }
- */
 
 function sendIOTResponse(counter, threshold, res, responseData) {
     if (counter >= threshold) {
