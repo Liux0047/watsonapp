@@ -13,3 +13,6 @@ central banks
 
 
 https://gateway-a.watsonplatform.net/calls/data/GetNews?outputMode=json&start=now-60d&end=now&q.enriched.url.enrichedTitle.entities.entity.text=boj&count=999999&return=enriched.url.enrichedTitle.entities.entity.text,enriched.url.enrichedTitle.entities.entity.sentiment.score&apikey=d2c38d1f5fe8ae7a528f8f01d1ca36c291e23282&
+
+
+https://gateway-a.watsonplatform.net/calls/data/GetNews?apikey=ebd3a423e07ddaae345c6421485d36ff1a0ced11&outputMode=json&start=now-60d&end=now&q.enriched.url.keywords.keyword=|text=unemployment%20rate,sentiment.type=negative|&q.enriched.url.entities.entity=|text=US,type=Country|&timeSlice=1d
