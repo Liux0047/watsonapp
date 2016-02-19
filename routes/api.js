@@ -5,11 +5,27 @@
 var express = require('express');
 var router = express.Router();
 var https = require('https');
+var HttpsProxyAgent = require('https-proxy-agent');
+var urlApi = require('url');
 
-var API_KEY_1 = '3627a5a76ac122f8647f9f796e0e287b967417ab';
-var API_KEY_2 = 'd8f8c787d46a28787e2119fff692e863d020d7da';
-var API_KEY_3 = 'ebd3a423e07ddaae345c6421485d36ff1a0ced11';
+var CONFIG = {
+    PROXY: '',
+    WATSON_API_KEY_1: '3627a5a76ac122f8647f9f796e0e287b967417ab',
+    WATSON_API_KEY_2: 'd8f8c787d46a28787e2119fff692e863d020d7da',
+    WATSON_API_KEY_3: 'ebd3a423e07ddaae345c6421485d36ff1a0ced11'
+};
 
+try {
+    var localConfig = require('./local-config.json');
+    for(var k in localConfig) {
+        if(CONFIG.hasOwnProperty(k)) {
+            console.log('Replacing ' + k + ' from[' + CONFIG[k] + ' ] to [' + localConfig[k] + ']');
+            CONFIG[k] = localConfig[k];
+        }
+    }
+} catch(e) {
+    console.log('local configuration does not exist, ignore.', e);
+}
 
 var gateway = 'https://gateway-a.watsonplatform.net/calls/data/GetNews?outputMode=json&';
 var gatewayWithCount = gateway + 'count=999999&';
@@ -27,7 +43,7 @@ router.get('/keywords', function (req, res, next) {
 
     var responseData = {};
 
-    doAjax(buildKeywordsUrl(options, API_KEY_1), function (result) {
+    doAjax(buildKeywordsUrl(options, CONFIG.WATSON_API_KEY_1), function (result) {
         res.json(result);
     });
 });
@@ -44,17 +60,17 @@ router.get('/ioc', function (req, res, next) {
 
     var responseData = {};
 
-    doAjax(buildIOTUrl('positive', options, API_KEY_1), function (result) {
+    doAjax(buildIOTUrl('positive', options, CONFIG.WATSON_API_KEY_1), function (result) {
         responseData.positiveCounts = result;
         sendIOTResponse(++responseCounter, 3, res, responseData);
     });
 
-    doAjax(buildIOTUrl('negative', options, API_KEY_2), function (result) {
+    doAjax(buildIOTUrl('negative', options, CONFIG.WATSON_API_KEY_2), function (result) {
         responseData.negativeCounts = result;
         sendIOTResponse(++responseCounter, 3, res, responseData);
     });
 
-    doAjax(buildIOTUrl('neutral', options, API_KEY_3), function (result) {
+    doAjax(buildIOTUrl('neutral', options, CONFIG.WATSON_API_KEY_3), function (result) {
         responseData.neutralCounts = result;
         sendIOTResponse(++responseCounter, 3, res, responseData);
 
@@ -70,7 +86,7 @@ router.get('/relevant-correlations', function (req, res, next) {
 
     var entitiesWrapper = {};
 
-    doAjax(buildRelevantEntitiesUrl(options, API_KEY_1), function (response) {
+    doAjax(buildRelevantEntitiesUrl(options, CONFIG.WATSON_API_KEY_2), function (response) {
 
         var counter = 0;
         response = require('../public/JPY-entity.json');
@@ -111,9 +127,13 @@ router.get('/relevant-correlations', function (req, res, next) {
 
 module.exports = router;
 
-
 function doAjax(url, callback, callbackParams) {
-    https.get(url, function (httpsRes) {
+    var opts = urlApi.parse(url);
+    if(CONFIG.PROXY !== '') {
+        var agent = new HttpsProxyAgent(CONFIG.PROXY);
+        opts.agent = agent;
+    }
+    https.get(opts, function (httpsRes) {
         console.log('Got response: ' + httpsRes.statusCode);
         var data = [];
         // consume response body

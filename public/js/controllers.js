@@ -262,7 +262,7 @@ function processKeywordsData(rawResponse, keywordsWrapper) {
     var result = [];
     for (var text in keywordsWrapper) {
         var keyword = keywordsWrapper[text];
-        if (keyword.relevance > 3) {
+        if (keyword.relevance > 0.5) {
             result.push({
                 x: ((new Date()).getTime() / 1000 - keyword.timestamp) / (24 * 3600),
                 y: keyword.sentimentScore / keyword.count,

@@ -37,3 +37,5 @@ public/bower_components
 
 .idea
 public/sample-data
+*.iml
+routes/local-config.json
