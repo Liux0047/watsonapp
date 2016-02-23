@@ -14,9 +14,9 @@ var urlApi = require('url');
 
 var CONFIG = {
     PROXY: '',
-    WATSON_API_KEY_1: '471ccf386c13f586b9872de945f4834b390a0807',
-    WATSON_API_KEY_2: '3627a5a76ac122f8647f9f796e0e287b967417ab',
-    WATSON_API_KEY_3: 'ebd3a423e07ddaae345c6421485d36ff1a0ced11'
+    WATSON_API_KEY: '471ccf386c13f586b9872de945f4834b390a0807',
+    //WATSON_API_KEY_2: '3627a5a76ac122f8647f9f796e0e287b967417ab',
+    //WATSON_API_KEY_3: 'ebd3a423e07ddaae345c6421485d36ff1a0ced11'
 };
 
 try {
@@ -47,7 +47,7 @@ router.get('/keywords', function (req, res, next) {
 
     var responseData = {};
 
-    doAjax(buildKeywordsUrl(options, CONFIG.WATSON_API_KEY_1), function (result) {
+    doAjax(buildKeywordsUrl(options), function (result) {
         res.json(result);
     });
 });
@@ -61,24 +61,18 @@ router.get('/sentiment', function (req, res, next) {
     };
 
     var responseCounter = 0;
-    var requestNum = 3
+    var requestNum = 2
 
     var responseData = {};
 
-    doAjax(buildSentimentUrl('positive', options, CONFIG.WATSON_API_KEY_1), function (result) {
+    doAjax(buildSentimentUrl('positive', options), function (result) {
         responseData.positiveCounts = result;
         sendSentimentResponse(++responseCounter, requestNum, res, responseData);
     });
     
-    doAjax(buildSentimentUrl('negative', options, CONFIG.WATSON_API_KEY_1), function (result) {
+    doAjax(buildSentimentUrl('negative', options), function (result) {
         responseData.negativeCounts = result;
         sendSentimentResponse(++responseCounter, requestNum, res, responseData);
-    });
-
-    doAjax(buildSentimentUrl('neutral', options, CONFIG.WATSON_API_KEY_1), function (result) {
-        responseData.neutralCounts = result;
-        sendSentimentResponse(++responseCounter, requestNum, res, responseData);
-
     });
 });
 
@@ -91,7 +85,7 @@ router.get('/relevant-correlations', function (req, res, next) {
 
     var entitiesWrapper = {};
 
-    doAjax(buildRelevantEntitiesUrl(options, CONFIG.WATSON_API_KEY_2), function (response) {
+    doAjax(buildRelevantEntitiesUrl(options), function (response) {
 
         var counter = 0;
         response = require('../public/JPY-entity.json');
@@ -156,15 +150,15 @@ function doAjax(url, callback, callbackParams) {
 }
 
 
-function buildSentimentUrl(sentiment, options, apiKey) {
+function buildSentimentUrl(sentiment, options) {
     var url = gateway + 'start=now-60d&end=now&timeSlice=1d&' + 
         'q.enriched.url.entities.entity=|text=' + options.searchText + ',sentiment.type='+ sentiment + '|&' +
-        'apikey=' + apiKey;
+        'apikey=' + CONFIG.WATSON_API_KEY;
         console.log(url);
     return url;
 }
 
-function buildKeywordsUrl(options, apiKey) {
+function buildKeywordsUrl(options) {
     var type = '';
     if (typeof options.entityType != 'undefined' && options.entityType.length){
         type = ',type='+ options.entityType;
@@ -175,15 +169,15 @@ function buildKeywordsUrl(options, apiKey) {
         'entities.entity=|text=' + options.entityName + type + ',relevance=>0.8|&' +
         'q.enriched.url.taxonomy.taxonomy_.label=[business%20and%20industrial^finance]&' +
         'return=' + returnParams + '&' +
-        'dedup=1&apikey=' + apiKey;
+        'dedup=1&apikey=' + CONFIG.WATSON_API_KEY;
     return url;
 }
 
-function buildRelevantEntitiesUrl(options, apiKey) {
+function buildRelevantEntitiesUrl(options) {
     var url = gatewayWithCount + 'start=now-60d&end=now' +
         'q.' + enrichedTitle + 'entities.entity.text=' + options.searchText + '&' +
         'return=' + enriched + 'entities.entity.text,' + enriched + 'entities.entity.relevance&' +
-        'dedup=1&apikey=' + apiKey;
+        'dedup=1&apikey=' + CONFIG.WATSON_API_KEY;
     return url;
 }
 

@@ -108,15 +108,6 @@ function getSentiment($http) {
                     });
                 }
 
-                if (response.neutralCounts.status == "OK") {
-                    options.series.push({
-                        name: 'Neutral',
-                        data: response.neutralCounts.result.slices,
-                        pointStart: (new Date()).getTime() - 24*60*3600,
-                        pointInterval: 24 * 3600 * 1000 // one day
-                    });
-                }
-
                 if (response.negativeCounts.status == "OK") {
                     options.series.push({
                         name: 'Negative',
