@@ -21,11 +21,11 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
             url: "/index",
             templateUrl: "views/common/content.html",
         })
-        .state('index.interest-over-time', {
-            url: "/interest-over-time",
-            templateUrl: "views/interest-over-time.html",
-            data: {pageTitle: 'Interes Over Time'},
-            controller: IOTController
+        .state('index.sentiment', {
+            url: "/sentiment",
+            templateUrl: "views/sentiment.html",
+            data: {pageTitle: 'Sentiment Analysis'},
+            controller: sentimentController
         })
         .state('index.keywords', {
             url: "/keywords",

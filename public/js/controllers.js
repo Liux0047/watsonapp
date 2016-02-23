@@ -19,14 +19,16 @@ angular
     .controller('MainCtrl', MainCtrl);
 
 
-function IOTController($scope, $http) {
-    getIOC($http);
+function sentimentController($scope, $http) {
+    getSentiment($http);
+    /*
     $('#top-search').keyup(function (event) {
         if (event.keyCode == 13) {
             event.preventDefault();
-            getIOC($http);
+            getSentiment($http);
         }
     });
+    */
 }
 
 function keywordsController($scope, $http) {    
@@ -52,13 +54,13 @@ function relevantCorrelationsController($scope, $http) {
     }
 }
 
-function getIOC($http) {
-    var input = $('#top-search').val();
+function getSentiment($http) {
+    var input = "commodity";
     if (input.length) {
 
         var options = {
             title: {
-                text: 'Interest Over Time',
+                text: 'Sentiment Analysis',
                 x: -20 //center
             },
             subtitle: {
@@ -70,12 +72,16 @@ function getIOC($http) {
             },
             xAxis: {
                 title: {
-                    text: 'time (day)'
+                    text: 'Date time'
                 },
+                type: 'datetime',
+                dateTimeLabelFormats: {
+                    day: '%e of %b'
+                }
             },
             yAxis: {
                 title: {
-                    text: 'Mentions'
+                    text: null
                 }
             },
             tooltip: {
@@ -89,28 +95,34 @@ function getIOC($http) {
             }
         };
 
-        $http.get("/api/ioc?searchText=" + input)
+        $http.get("/api/sentiment?searchText=" + input)
             .then(function (response) {
                 options.series = [];
                 response = response.data;
                 if (response.positiveCounts.status == "OK") {
                     options.series.push({
                         name: 'Positvie',
-                        data: response.positiveCounts.result.slices
+                        data: response.positiveCounts.result.slices,
+                        pointStart: (new Date()).getTime() - 24*60*3600,
+                        pointInterval: 24 * 3600 * 1000 // one day
                     });
                 }
 
                 if (response.neutralCounts.status == "OK") {
                     options.series.push({
                         name: 'Neutral',
-                        data: response.neutralCounts.result.slices
+                        data: response.neutralCounts.result.slices,
+                        pointStart: (new Date()).getTime() - 24*60*3600,
+                        pointInterval: 24 * 3600 * 1000 // one day
                     });
                 }
 
                 if (response.negativeCounts.status == "OK") {
                     options.series.push({
                         name: 'Negative',
-                        data: response.negativeCounts.result.slices
+                        data: response.negativeCounts.result.slices,
+                        pointStart: (new Date()).getTime() - 24*60*3600,
+                        pointInterval: 24 * 3600 * 1000 // one day
                     });
                 }
 
@@ -147,6 +159,10 @@ function getKeywords($http, updateLinks) {
             xAxis: {
                 title: {
                     text: 'Timestamp'
+                },
+                type: 'datetime',
+                dateTimeLabelFormats: {
+                    day: '%e of %b'
                 }
             },
 
@@ -154,7 +170,7 @@ function getKeywords($http, updateLinks) {
                 startOnTick: false,
                 endOnTick: false,
                 title: {
-                    text: 'Sentiment'
+                    text: null
                 }
             },
 
@@ -253,11 +269,12 @@ function processKeywordsData(rawResponse, entitiesWrapper) {
         var keyword = entitiesWrapper[text];
         if (keyword.relevance > 0.5) {
             result.push({
-                x: ((new Date()).getTime() / 1000 - keyword.timestamp) / (24 * 3600),
+                //x: 30 - ((new Date()).getTime() / 1000 - keyword.timestamp) / (24 * 3600),
+                x: keyword.timestamp * 1000,
                 y: keyword.sentimentScore / keyword.count,
                 z: keyword.relevance,
                 name: text,
-                date: (new Date(keyword.timestamp)).toDateString()
+                date: (new Date(keyword.timestamp * 1000)).toDateString()
             });
         }
     }

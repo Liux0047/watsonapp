@@ -53,30 +53,31 @@ router.get('/keywords', function (req, res, next) {
 });
 
 
-router.get('/ioc', function (req, res, next) {
+router.get('/sentiment', function (req, res, next) {
     var options = {
         start: req.query.start,
         end: req.query.end,
-        title: req.query.searchText
+        searchText: req.query.searchText
     };
 
     var responseCounter = 0;
+    var requestNum = 3
 
     var responseData = {};
 
-    doAjax(buildIOTUrl('positive', options, CONFIG.WATSON_API_KEY_1), function (result) {
+    doAjax(buildSentimentUrl('positive', options, CONFIG.WATSON_API_KEY_1), function (result) {
         responseData.positiveCounts = result;
-        sendIOTResponse(++responseCounter, 3, res, responseData);
+        sendSentimentResponse(++responseCounter, requestNum, res, responseData);
     });
-
-    doAjax(buildIOTUrl('negative', options, CONFIG.WATSON_API_KEY_2), function (result) {
+    
+    doAjax(buildSentimentUrl('negative', options, CONFIG.WATSON_API_KEY_1), function (result) {
         responseData.negativeCounts = result;
-        sendIOTResponse(++responseCounter, 3, res, responseData);
+        sendSentimentResponse(++responseCounter, requestNum, res, responseData);
     });
 
-    doAjax(buildIOTUrl('neutral', options, CONFIG.WATSON_API_KEY_3), function (result) {
+    doAjax(buildSentimentUrl('neutral', options, CONFIG.WATSON_API_KEY_1), function (result) {
         responseData.neutralCounts = result;
-        sendIOTResponse(++responseCounter, 3, res, responseData);
+        sendSentimentResponse(++responseCounter, requestNum, res, responseData);
 
     });
 });
@@ -155,10 +156,11 @@ function doAjax(url, callback, callbackParams) {
 }
 
 
-function buildIOTUrl(sentiment, options, apiKey) {
-    var url = gatewayWithCount + 'start=now-30d&end=now&timeSlice=1d&q.enriched.url.entities.entity=|text=' + options.searchText + ',type=company|&' +
-        '&q.enriched.url.enrichedTitle.docSentiment=|type=' + sentiment + '|&' +
+function buildSentimentUrl(sentiment, options, apiKey) {
+    var url = gateway + 'start=now-60d&end=now&timeSlice=1d&' + 
+        'q.enriched.url.entities.entity=|text=' + options.searchText + ',sentiment.type='+ sentiment + '|&' +
         'apikey=' + apiKey;
+        console.log(url);
     return url;
 }
 
@@ -171,6 +173,7 @@ function buildKeywordsUrl(options, apiKey) {
         enriched + 'url,' + enriched + 'title';
     var url = gatewayWithCount + 'start=now-' + options.rangeInDays + 'd&end=now&q.' + enriched +
         'entities.entity=|text=' + options.entityName + type + ',relevance=>0.8|&' +
+        'q.enriched.url.taxonomy.taxonomy_.label=[business%20and%20industrial^finance]&' +
         'return=' + returnParams + '&' +
         'dedup=1&apikey=' + apiKey;
     return url;
@@ -184,7 +187,7 @@ function buildRelevantEntitiesUrl(options, apiKey) {
     return url;
 }
 
-function sendIOTResponse(counter, threshold, res, responseData) {
+function sendSentimentResponse(counter, threshold, res, responseData) {
     if (counter >= threshold) {
         res.json(responseData);
     }
