@@ -5,7 +5,11 @@
 var express = require('express');
 var router = express.Router();
 var https = require('https');
-var HttpsProxyAgent = require('https-proxy-agent');
+try {
+var HttpsProxyAgent = require('https-proxy-agent');    
+} catch (e){
+    console.log('env: https-proxy-agent does not exits');
+}
 var urlApi = require('url');
 
 var CONFIG = {
