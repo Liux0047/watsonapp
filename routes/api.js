@@ -14,8 +14,8 @@ var urlApi = require('url');
 
 var CONFIG = {
     PROXY: '',
-    WATSON_API_KEY_1: '3627a5a76ac122f8647f9f796e0e287b967417ab',
-    WATSON_API_KEY_2: 'd8f8c787d46a28787e2119fff692e863d020d7da',
+    WATSON_API_KEY_1: '471ccf386c13f586b9872de945f4834b390a0807',
+    WATSON_API_KEY_2: '3627a5a76ac122f8647f9f796e0e287b967417ab',
     WATSON_API_KEY_3: 'ebd3a423e07ddaae345c6421485d36ff1a0ced11'
 };
 
@@ -167,10 +167,10 @@ function buildKeywordsUrl(options, apiKey) {
     if (typeof options.entityType != 'undefined' && options.entityType.length){
         type = ',type='+ options.entityType;
     }
-    var returnParams = enriched + 'keywords.keyword.text,' + enriched + 'keywords.keyword.sentiment.score,' + enriched + 'keywords.keyword.relevance,' +
+    var returnParams = enriched + 'entities.entity.text,' + enriched + 'entities.entity.sentiment.score,' + enriched + 'entities.entity.relevance,' +
         enriched + 'url,' + enriched + 'title';
     var url = gatewayWithCount + 'start=now-' + options.rangeInDays + 'd&end=now&q.' + enriched +
-        'entities.entity=|text=' + options.entityName + type + ',relevance=>0.6|&' +
+        'entities.entity=|text=' + options.entityName + type + ',relevance=>0.8|&' +
         'return=' + returnParams + '&' +
         'dedup=1&apikey=' + apiKey;
     return url;

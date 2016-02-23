@@ -1,99 +1,10 @@
-<div class="wrapper wrapper-content animated fadeInRight">
+<div class="animated fadeInRight">
     <div class="row">
-
-        <div class="col-lg-12">
-            <div class="ibox float-e-margins">
-                <div class="ibox-title">
-                    <h5>Find relevant keywords for</h5>
-                    <div class="ibox-tools">
-                        <a class="collapse-link">
-                            <i class="fa fa-chevron-up"></i>
-                        </a>
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            <i class="fa fa-wrench"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-user">
-                            <li><a href="#">Config option 1</a>
-                            </li>
-                            <li><a href="#">Config option 2</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="ibox-content">
-                    <form role="form" class="form-inline" onsubmit="return false;">
-
-                        <div class="form-group">
-                            <label for="entity-name" class="sr-only">Entity Name</label>
-                            <input type="text" placeholder="Entity Name" id="entity-name"
-                                   class="form-control">
-                            <span style="padding-left: 20px;">as</span>
-                        </div>
-                        <select class="select2 form-control">
-                            <option>Any</option>
-                            <option value="Anatomy">Anatomy</option>
-                            <option value="Anniversary">Anniversary</option>
-                            <option value="Automobile">Automobile</option>
-                            <option value="City">City</option>
-                            <option value="Company">Company</option>
-                            <option value="Continent">Continent</option>
-                            <option value="Country">Country</option>
-                            <option value="Crime">Crime</option>
-                            <option value="Degree">Degree</option>
-                            <option value="Drug">Drug</option>
-                            <option value="EntertainmentAward">EntertainmentAward</option>
-                            <option value="Facility">Facility</option>
-                            <option value="FieldTerminology">FieldTerminology</option>
-                            <option value="FinancialMarketIndex">FinancialMarketIndex</option>
-                            <option value="GeographicFeature">GeographicFeature</option>
-                            <option value="HealthCondition">HealthCondition</option>
-                            <option value="Holiday">Holiday</option>
-                            <option value="JobTitle">JobTitle</option>
-                            <option value="Movie">Movie</option>
-                            <option value="MusicGroup">MusicGroup</option>
-                            <option value="NaturalDisaster">NaturalDisaster</option>
-                            <option value="OperatingSystem">OperatingSystem</option>
-                            <option value="Organization">Organization</option>
-                            <option value="Person">Person</option>
-                            <option value="PrintMedia">PrintMedia</option>
-                            <option value="Product">Product</option>
-                            <option value="ProfessionalDegree">ProfessionalDegree</option>
-                            <option value="RadioProgram">RadioProgram</option>
-                            <option value="RadioStation">RadioStation</option>
-                            <option value="Region">Region</option>
-                            <option value="Sport">Sport</option>
-                            <option value="SportingEvent">SportingEvent</option>
-                            <option value="StateOrCounty">StateOrCounty</option>
-                            <option value="Technology">Technology</option>
-                            <option value="TelevisionShow">TelevisionShow</option>
-                            <option value="TelevisionStation">TelevisionStation</option>
-                            <option value="EmailAddress">EmailAddress</option>
-                            <option value="TwitterHandle">TwitterHandle</option>
-                            <option value="Hashtag">Hashtag</option>
-                            <option value="IPAddress">IPAddress</option>
-                            <option value="Quantity">Quantity</option>
-                            <option value="Money">Money</option>
-                        </select>
-
-                        <div class="form-group">
-                            <span style="padding-left: 20px;">for past</span>
-                            <label for="range-in-days" class="sr-only">Entity Name</label>
-                            <input type="text" value="60" id="range-in-days"
-                                   class="form-control">
-                            <span style="padding-right: 20px;">days</span>
-                        </div>
-
-                        <button class="btn btn-primary" id="keywords-search-btn">Search</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
         <div class="col-lg-12">
             <div class="text-center m-t-lg">
                 <div class="ibox" style="display: none" id="keywords-container">
                     <div class="ibox-title">
-                        <h5>Graph</h5>
+                        <h5>Relevant Keywords</h5>
                     </div>
                     <div class="ibox-content">
                         <div id="keywords-chart" style="min-width: 310px; height: 600px; margin: 0 auto"></div>

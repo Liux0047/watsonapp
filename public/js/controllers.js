@@ -29,25 +29,14 @@ function IOTController($scope, $http) {
     });
 }
 
-function keywordsController($scope, $http) {
-    $('.select2').select2();
-    $("input[id='range-in-days']").TouchSpin({
-        min: 1,
-        max: 60,
-        buttondown_class: 'btn btn-white',
-        buttonup_class: 'btn btn-white'
-
-    });
+function keywordsController($scope, $http) {    
     var updateLinks = function (links) {
         $scope.$apply(function () {
             $scope.links = links;
             console.log($scope.links);
         });
     }
-    $('#keywords-search-btn').click(function (event) {
-        getKeywords($http, updateLinks);
-
-    });
+    getKeywords($http, updateLinks);
 }
 
 
@@ -131,8 +120,8 @@ function getIOC($http) {
 }
 
 function getKeywords($http, updateLinks) {
-    var entityName = $('#entity-name').val();
-    var keywordsWrapper = {};
+    var entityName = "commodity";
+    var entitiesWrapper = {};
 
     if (entityName.length) {
 
@@ -189,7 +178,7 @@ function getKeywords($http, updateLinks) {
                     point: {
                         events: {
                             click: function () {
-                                updateLinks(keywordsWrapper[this.name].links);
+                                updateLinks(entitiesWrapper[this.name].links);
                                 $('#myModal').modal('show');
                             }
                         }
@@ -203,14 +192,14 @@ function getKeywords($http, updateLinks) {
             url: '/api/keywords',
             params: {
                 entityName: entityName,
-                entityType: $('#entity-type').val(),
-                rangeInDays: $('#range-in-days').val()
+                entityType: null,
+                rangeInDays: 30
             }
         }).then(function (response) {
             options.series = [];
             response = response.data;
             if (response.status == "OK") {
-                var data = processKeywordsData(response, keywordsWrapper);
+                var data = processKeywordsData(response, entitiesWrapper);
                 options.series.push({
                     data: data
                 });
@@ -222,30 +211,30 @@ function getKeywords($http, updateLinks) {
 
 }
 
-function processKeywordsData(rawResponse, keywordsWrapper) {
+function processKeywordsData(rawResponse, entitiesWrapper) {
     var docs = rawResponse.result.docs;
     for (var i = 0; i < docs.length; i++) {
         if (Object.keys(docs[i].source).length) {
-            var keywords = docs[i].source.enriched.url.keywords;
-            for (var j = 0; j < keywords.length; j++) {
-                var keyword = keywords[j];
-                if (keyword.relevance >= 0.9) {
-                    if (typeof keywordsWrapper[keyword.text] != 'undefined') {
-                        keywordsWrapper[keyword.text].count++;
-                        keywordsWrapper[keyword.text].relevance += keyword.relevance;
-                        keywordsWrapper[keyword.text].sentimentScore += keyword.sentiment.score;
-                        keywordsWrapper[keyword.text].timestamp = docs[i].timestamp;
-                        keywordsWrapper[keyword.text].links.push(
+            var entities = docs[i].source.enriched.url.entities;
+            for (var j = 0; j < entities.length; j++) {
+                var entity = entities[j];
+                if (entity.relevance >= 0.9) {
+                    if (typeof entitiesWrapper[entity.text] != 'undefined') {
+                        entitiesWrapper[entity.text].count++;
+                        entitiesWrapper[entity.text].relevance += entity.relevance;
+                        entitiesWrapper[entity.text].sentimentScore += entity.sentiment.score;
+                        entitiesWrapper[entity.text].timestamp = docs[i].timestamp;
+                        entitiesWrapper[entity.text].links.push(
                             {
                                 title: docs[i].source.enriched.url.title,
                                 url: docs[i].source.enriched.url.url
                             }
                         );
                     } else {
-                        keywordsWrapper[keyword.text] = {
+                        entitiesWrapper[entity.text] = {
                             count: 1,
-                            relevance: keyword.relevance,
-                            sentimentScore: keyword.sentiment.score,
+                            relevance: entity.relevance,
+                            sentimentScore: entity.sentiment.score,
                             timestamp: docs[i].timestamp,
                             links: [{
                                 title: docs[i].source.enriched.url.title,
@@ -260,8 +249,8 @@ function processKeywordsData(rawResponse, keywordsWrapper) {
     }
 
     var result = [];
-    for (var text in keywordsWrapper) {
-        var keyword = keywordsWrapper[text];
+    for (var text in entitiesWrapper) {
+        var keyword = entitiesWrapper[text];
         if (keyword.relevance > 0.5) {
             result.push({
                 x: ((new Date()).getTime() / 1000 - keyword.timestamp) / (24 * 3600),
