@@ -2,32 +2,32 @@
  * Created by Allen on 2/4/2016.
  */
 
- var express = require('express');
- var router = express.Router();
- var https = require('https');
- try {
-    var HttpsProxyAgent = require('https-proxy-agent');    
-} catch (e){
+var express = require('express');
+var router = express.Router();
+var https = require('https');
+try {
+    var HttpsProxyAgent = require('https-proxy-agent');
+} catch (e) {
     console.log('env: https-proxy-agent does not exits');
 }
 var urlApi = require('url');
 
 var CONFIG = {
     PROXY: '',
-    WATSON_API_KEY: '471ccf386c13f586b9872de945f4834b390a0807',
+    WATSON_API_KEY: '471ccf386c13f586b9872de945f4834b390a0807'
     //WATSON_API_KEY_2: '3627a5a76ac122f8647f9f796e0e287b967417ab',
     //WATSON_API_KEY_3: 'ebd3a423e07ddaae345c6421485d36ff1a0ced11'
 };
 
 try {
     var localConfig = require('./local-config.json');
-    for(var k in localConfig) {
-        if(CONFIG.hasOwnProperty(k)) {
+    for (var k in localConfig) {
+        if (CONFIG.hasOwnProperty(k)) {
             console.log('Replacing ' + k + ' from[' + CONFIG[k] + ' ] to [' + localConfig[k] + ']');
             CONFIG[k] = localConfig[k];
         }
     }
-} catch(e) {
+} catch (e) {
     console.log('local configuration does not exist, ignore.', e);
 }
 
@@ -35,7 +35,6 @@ var gateway = 'https://gateway-a.watsonplatform.net/calls/data/GetNews?outputMod
 var gatewayWithCount = gateway + 'count=999999&';
 var enriched = 'enriched.url.';
 var enrichedTitle = 'enriched.url.enrichedTitle.';
-var RELEVANCE_THRESHOLD = 0.5;
 
 /* GET api listing. */
 router.get('/keywords', function (req, res, next) {
@@ -61,7 +60,7 @@ router.get('/sentiment', function (req, res, next) {
     };
 
     var responseCounter = 0;
-    var requestNum = 2
+    var requestNum = 2;
 
     var responseData = {};
 
@@ -69,7 +68,7 @@ router.get('/sentiment', function (req, res, next) {
         responseData.positiveCounts = result;
         sendAsyncResponse(++responseCounter, requestNum, res, responseData);
     });
-    
+
     doAjax(buildSentimentUrl('negative', options), function (result) {
         responseData.negativeCounts = result;
         sendAsyncResponse(++responseCounter, requestNum, res, responseData);
@@ -82,21 +81,21 @@ router.get('/breakdown', function (req, res, next) {
         end: req.query.end
     };
 
-    
+
     var entries = req.query.entries.split(",");
-    var numEntries= entries.length * 2;
+    var numEntries = entries.length * 2;
     var responseData = {
-        entries:[]
+        entries: []
     };
     var responseCounter = 0;
     var sentiments = ['positive', 'negative'];
 
-    for (var i=0; i<entries.length; i++){        
-        for (var z= 0; z< sentiments.length; z++){
+    for (var i = 0; i < entries.length; i++) {
+        for (var z = 0; z < sentiments.length; z++) {
             var callbackParams = {
                 'entry': entries[i],
-                'sentiment' : sentiments[z]
-            };  
+                'sentiment': sentiments[z]
+            };
 
             doAjax(buildBreakdownUrl(entries[i], sentiments[z], numEntries), function (result, callbackParams) {
                 var positiveCounts = result;
@@ -104,9 +103,9 @@ router.get('/breakdown', function (req, res, next) {
                     entryName: callbackParams.entry,
                     sentiment: callbackParams.sentiment,
                     counts: result.result.slices
-                }
+                };
                 responseData.entries.push(entry);
-                console.log("test sedning " + callbackParams.entry + " " +callbackParams.sentiment +" " + responseCounter);
+                console.log("test sending " + callbackParams.entry + " " + callbackParams.sentiment + " " + responseCounter);
                 sendAsyncResponse(++responseCounter, numEntries, res, responseData);
             }, callbackParams);
         }
@@ -118,7 +117,7 @@ module.exports = router;
 
 function doAjax(url, callback, callbackParams) {
     var opts = urlApi.parse(url);
-    if(CONFIG.PROXY !== '') {
+    if (CONFIG.PROXY !== '') {
         var agent = new HttpsProxyAgent(CONFIG.PROXY);
         opts.agent = agent;
     }
@@ -141,34 +140,33 @@ function doAjax(url, callback, callbackParams) {
 
 
 function buildSentimentUrl(sentiment, options) {
-    var url = gateway + 'start=now-60d&end=now&timeSlice=1d&' + 
-    'q.enriched.url.entities.entity=|text=' + options.searchText + ',sentiment.type='+ sentiment + '|&' +
-    'q.enriched.url.taxonomy.taxonomy_.label=[business%20and%20industrial^finance]&' +
-    'apikey=' + CONFIG.WATSON_API_KEY;
+    var url = gateway + 'start=now-60d&end=now&timeSlice=1d&' +
+        'q.enriched.url.entities.entity=|text=' + options.searchText + ',sentiment.type=' + sentiment + '|&' +
+        'q.enriched.url.taxonomy.taxonomy_.label=[business%20and%20industrial^finance]&' +
+        'apikey=' + CONFIG.WATSON_API_KEY;
     return url;
 }
 
 function buildKeywordsUrl(options) {
     var type = '';
-    if (typeof options.entityType != 'undefined' && options.entityType.length){
-        type = ',type='+ options.entityType;
+    if (typeof options.entityType != 'undefined' && options.entityType.length) {
+        type = ',type=' + options.entityType;
     }
     var returnParams = enriched + 'entities.entity.text,' + enriched + 'entities.entity.sentiment.score,' + enriched + 'entities.entity.relevance,' +
-    enriched + 'url,' + enriched + 'title';
+        enriched + 'url,' + enriched + 'title';
     var url = gatewayWithCount + 'start=now-' + options.rangeInDays + 'd&end=now&q.' + enriched +
-    'entities.entity=|text=' + options.entityName + type + ',relevance=>0.8|&' +
-    'q.enriched.url.taxonomy.taxonomy_.label=[business%20and%20industrial^finance]&' +
-    'return=' + returnParams + '&' +
-    'dedup=1&apikey=' + CONFIG.WATSON_API_KEY;
+        'entities.entity=|text=' + options.entityName + type + ',relevance=>0.8|&' +
+        'q.enriched.url.taxonomy.taxonomy_.label=[business%20and%20industrial^finance]&' +
+        'return=' + returnParams + '&' +
+        'dedup=1&apikey=' + CONFIG.WATSON_API_KEY;
     return url;
 }
 
 function buildBreakdownUrl(entry, sentiment, options) {
-    var url = gateway + 'start=now-30d&end=now&timeSlice=1d&' + 
-    'q.enriched.url.entities.entity=|text=' + entry + ',sentiment.type='+ sentiment + '|&' +
-    //'q.enriched.url.taxonomy.taxonomy_.label=[business%20and%20industrial^finance]&' +
-    'apikey=' + CONFIG.WATSON_API_KEY;
-    console.log(url);
+    var url = gateway + 'start=now-30d&end=now&timeSlice=1d&' +
+        'q.enriched.url.entities.entity=|text=' + entry + ',sentiment.type=' + sentiment + '|&' +
+            //'q.enriched.url.taxonomy.taxonomy_.label=[business%20and%20industrial^finance]&' +
+        'apikey=' + CONFIG.WATSON_API_KEY;
     return url;
 }
 

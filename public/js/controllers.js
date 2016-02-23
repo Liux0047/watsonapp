@@ -22,16 +22,16 @@ angular
 function sentimentController($scope, $http) {
     getSentiment($http);
     /*
-    $('#top-search').keyup(function (event) {
-        if (event.keyCode == 13) {
-            event.preventDefault();
-            getSentiment($http);
-        }
-    });
-    */
+     $('#top-search').keyup(function (event) {
+     if (event.keyCode == 13) {
+     event.preventDefault();
+     getSentiment($http);
+     }
+     });
+     */
 }
 
-function keywordsController($scope, $http) {    
+function keywordsController($scope, $http) {
     var updateLinks = function (links) {
         $scope.$apply(function () {
             $scope.links = links;
@@ -95,7 +95,7 @@ function getSentiment($http) {
                     options.series.push({
                         name: 'Positive',
                         data: response.positiveCounts.result.slices,
-                        pointStart: (new Date()).getTime() - 24*60*3600,
+                        pointStart: (new Date()).getTime() - 24 * 60 * 3600,
                         pointInterval: 24 * 3600 * 1000 // one day
                     });
                 }
@@ -104,7 +104,7 @@ function getSentiment($http) {
                     options.series.push({
                         name: 'Negative',
                         data: response.negativeCounts.result.slices,
-                        pointStart: (new Date()).getTime() - 24*60*3600,
+                        pointStart: (new Date()).getTime() - 24 * 60 * 3600,
                         pointInterval: 24 * 3600 * 1000 // one day
                     });
                 }
@@ -252,7 +252,6 @@ function processKeywordsData(rawResponse, entitiesWrapper) {
         var keyword = entitiesWrapper[text];
         if (keyword.relevance > 0.5) {
             result.push({
-                //x: 30 - ((new Date()).getTime() / 1000 - keyword.timestamp) / (24 * 3600),
                 x: keyword.timestamp * 1000,
                 y: keyword.sentimentScore / keyword.count,
                 z: keyword.relevance,
@@ -267,7 +266,7 @@ function processKeywordsData(rawResponse, entitiesWrapper) {
 
 
 function getBreakdown($http) {
-    
+
     var options = {
         title: {
             text: 'Breakdown Sentiment Analysis',
@@ -311,7 +310,7 @@ function getBreakdown($http) {
         params: {
             entries: "crude oil,natural gas,gold,silver"
         }
-    }).then(function (response) {        
+    }).then(function (response) {
         options.series = processBreakdownData(response.data);
         $('#breakdown-container').highcharts(options);
     });
@@ -322,23 +321,21 @@ function getBreakdown($http) {
 function processBreakdownData(response) {
     var entries = response.entries;
     var series = [];
-    var counter = 0;
     var calculated = [];
 
-    for (var i= 0; i< entries.length; i++){
+    for (var i = 0; i < entries.length; i++) {
         var entryName = entries[i].entryName;
         if (calculated.indexOf(entryName) == -1) {
-            var counts = [];    
-            for (var j= 0; j< entries.length; j++){            
-                if (entries[j].entryName == entryName && i != j) {            
-                    for (var z = 0; z<entries[j].counts.length; z++){
-                        if (entries[j].sentiment == 'positive'){
-                        counts[z] = Math.log((entries[j].counts[z] + 1) / (entries[i].counts[z] + 1));
-
+            var counts = [];
+            for (var j = 0; j < entries.length; j++) {
+                if (entries[j].entryName == entryName && i != j) {
+                    for (var z = 0; z < entries[j].counts.length; z++) {
+                        if (entries[j].sentiment == 'positive') {
+                            counts[z] = Math.log((entries[j].counts[z] + 1) / (entries[i].counts[z] + 1));
                         } else {
                             counts[z] = Math.log((entries[i].counts[z] + 1) / (entries[j].counts[z] + 1));
                         }
-                    
+
                     }
                 }
             }
@@ -351,7 +348,7 @@ function processBreakdownData(response) {
             });
 
         }
-        
+
 
     }
     return series;
