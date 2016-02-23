@@ -33,11 +33,11 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
             data: {pageTitle: 'Related Keywords'},
             controller: keywordsController
         })
-        .state('index.relevant-correlations', {
-            url: "/relevant-correlations",
-            templateUrl: "views/relevant-correlations.html",
-            data: {pageTitle: 'Relevant Correlations'},
-            controller: relevantCorrelationsController
+        .state('index.breakdown', {
+            url: "/breakdown",
+            templateUrl: "views/breakdown.html",
+            data: {pageTitle: 'Breakdown'},
+            controller: breakdownController
         })
 }
 angular

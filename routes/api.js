@@ -2,11 +2,11 @@
  * Created by Allen on 2/4/2016.
  */
 
-var express = require('express');
-var router = express.Router();
-var https = require('https');
-try {
-var HttpsProxyAgent = require('https-proxy-agent');    
+ var express = require('express');
+ var router = express.Router();
+ var https = require('https');
+ try {
+    var HttpsProxyAgent = require('https-proxy-agent');    
 } catch (e){
     console.log('env: https-proxy-agent does not exits');
 }
@@ -67,61 +67,51 @@ router.get('/sentiment', function (req, res, next) {
 
     doAjax(buildSentimentUrl('positive', options), function (result) {
         responseData.positiveCounts = result;
-        sendSentimentResponse(++responseCounter, requestNum, res, responseData);
+        sendAsyncResponse(++responseCounter, requestNum, res, responseData);
     });
     
     doAjax(buildSentimentUrl('negative', options), function (result) {
         responseData.negativeCounts = result;
-        sendSentimentResponse(++responseCounter, requestNum, res, responseData);
+        sendAsyncResponse(++responseCounter, requestNum, res, responseData);
     });
 });
 
-router.get('/relevant-correlations', function (req, res, next) {
+router.get('/breakdown', function (req, res, next) {
     var options = {
         start: req.query.start,
-        end: req.query.end,
-        title: req.query.searchText
+        end: req.query.end
     };
 
-    var entitiesWrapper = {};
+    
+    var entries = req.query.entries.split(",");
+    var numEntries= entries.length * 2;
+    var responseData = {
+        entries:[]
+    };
+    var responseCounter = 0;
+    var sentiments = ['positive', 'negative'];
 
-    doAjax(buildRelevantEntitiesUrl(options), function (response) {
+    for (var i=0; i<entries.length; i++){        
+        for (var z= 0; z< sentiments.length; z++){
+            var callbackParams = {
+                'entry': entries[i],
+                'sentiment' : sentiments[z]
+            };  
 
-        var counter = 0;
-        response = require('../public/JPY-entity.json');
-
-        if (response.status == 'OK') {
-            var docs = response.result.docs;
-            var sentimentScores = [];
-            for (var i = 0; i < docs.length; i++) {
-                var entities = docs[i].source.enriched.url.entities;
-
-                for (var j = 0; j < entities.length; j++) {
-                    var entity = entities[j];
-                    if (entity.relevance >= RELEVANCE_THRESHOLD) {
-                        if (typeof entitiesWrapper[entity.text] != 'undefined') {
-                            entitiesWrapper[entity.text].sentimentScores.push({
-                                'timestamp': docs[i].timestamp,
-                                'score': entity.sentiment.score
-                            });
-                            entitiesWrapper[entity.text].relevance += entity.relevance;
-                        } else {
-                            entitiesWrapper[entity.text] = {
-                                'text': entity.text,
-                                'sentimentScores': [{
-                                    'timestamp': docs[i].timestamp,
-                                    'score': entity.sentiment.score
-                                }],
-                                'relevance': entity.relevance
-                            }
-                        }
-                    }
-
+            doAjax(buildBreakdownUrl(entries[i], sentiments[z], numEntries), function (result, callbackParams) {
+                var positiveCounts = result;
+                var entry = {
+                    entryName: callbackParams.entry,
+                    sentiment: callbackParams.sentiment,
+                    counts: result.result.slices
                 }
-            }
-            res.json(entitiesWrapper);
+                responseData.entries.push(entry);
+                console.log("test sedning " + callbackParams.entry + " " +callbackParams.sentiment +" " + responseCounter);
+                sendAsyncResponse(++responseCounter, numEntries, res, responseData);
+            }, callbackParams);
         }
-    });
+    }
+
 });
 
 module.exports = router;
@@ -152,9 +142,9 @@ function doAjax(url, callback, callbackParams) {
 
 function buildSentimentUrl(sentiment, options) {
     var url = gateway + 'start=now-60d&end=now&timeSlice=1d&' + 
-        'q.enriched.url.entities.entity=|text=' + options.searchText + ',sentiment.type='+ sentiment + '|&' +
-        'apikey=' + CONFIG.WATSON_API_KEY;
-        console.log(url);
+    'q.enriched.url.entities.entity=|text=' + options.searchText + ',sentiment.type='+ sentiment + '|&' +
+    'q.enriched.url.taxonomy.taxonomy_.label=[business%20and%20industrial^finance]&' +
+    'apikey=' + CONFIG.WATSON_API_KEY;
     return url;
 }
 
@@ -164,24 +154,26 @@ function buildKeywordsUrl(options) {
         type = ',type='+ options.entityType;
     }
     var returnParams = enriched + 'entities.entity.text,' + enriched + 'entities.entity.sentiment.score,' + enriched + 'entities.entity.relevance,' +
-        enriched + 'url,' + enriched + 'title';
+    enriched + 'url,' + enriched + 'title';
     var url = gatewayWithCount + 'start=now-' + options.rangeInDays + 'd&end=now&q.' + enriched +
-        'entities.entity=|text=' + options.entityName + type + ',relevance=>0.8|&' +
-        'q.enriched.url.taxonomy.taxonomy_.label=[business%20and%20industrial^finance]&' +
-        'return=' + returnParams + '&' +
-        'dedup=1&apikey=' + CONFIG.WATSON_API_KEY;
+    'entities.entity=|text=' + options.entityName + type + ',relevance=>0.8|&' +
+    'q.enriched.url.taxonomy.taxonomy_.label=[business%20and%20industrial^finance]&' +
+    'return=' + returnParams + '&' +
+    'dedup=1&apikey=' + CONFIG.WATSON_API_KEY;
     return url;
 }
 
-function buildRelevantEntitiesUrl(options) {
-    var url = gatewayWithCount + 'start=now-60d&end=now' +
-        'q.' + enrichedTitle + 'entities.entity.text=' + options.searchText + '&' +
-        'return=' + enriched + 'entities.entity.text,' + enriched + 'entities.entity.relevance&' +
-        'dedup=1&apikey=' + CONFIG.WATSON_API_KEY;
+function buildBreakdownUrl(entry, sentiment, options) {
+    var url = gateway + 'start=now-30d&end=now&timeSlice=1d&' + 
+    'q.enriched.url.entities.entity=|text=' + entry + ',sentiment.type='+ sentiment + '|&' +
+    //'q.enriched.url.taxonomy.taxonomy_.label=[business%20and%20industrial^finance]&' +
+    'apikey=' + CONFIG.WATSON_API_KEY;
+    console.log(url);
     return url;
 }
 
-function sendSentimentResponse(counter, threshold, res, responseData) {
+
+function sendAsyncResponse(counter, threshold, res, responseData) {
     if (counter >= threshold) {
         res.json(responseData);
     }

@@ -42,16 +42,8 @@ function keywordsController($scope, $http) {
 }
 
 
-function relevantCorrelationsController($scope, $http) {
-    var input = $('#top-search').val();
-    if (input.length) {
-        $http.get("/api/relevant-correlations?searchText=" + input)
-            .then(function (response) {
-                console.log(response);
-                $scope.sentimentData = response.data;
-
-            });
-    }
+function breakdownController($scope, $http) {
+    getBreakdown($http);
 }
 
 function getSentiment($http) {
@@ -101,7 +93,7 @@ function getSentiment($http) {
                 response = response.data;
                 if (response.positiveCounts.status == "OK") {
                     options.series.push({
-                        name: 'Positvie',
+                        name: 'Positive',
                         data: response.positiveCounts.result.slices,
                         pointStart: (new Date()).getTime() - 24*60*3600,
                         pointInterval: 24 * 3600 * 1000 // one day
@@ -117,7 +109,7 @@ function getSentiment($http) {
                     });
                 }
 
-                $('#container').highcharts(options);
+                $('#sentiment-container').highcharts(options);
             });
     }
 }
@@ -271,4 +263,97 @@ function processKeywordsData(rawResponse, entitiesWrapper) {
     }
 
     return result;
+}
+
+
+function getBreakdown($http) {
+    
+    var options = {
+        title: {
+            text: 'Breakdown Sentiment Analysis',
+            x: -20 //center
+        },
+        subtitle: {
+            text: 'Source: ibm.com',
+            x: -20
+        },
+        chart: {
+            zoomType: 'x'
+        },
+        xAxis: {
+            title: {
+                text: 'Date time'
+            },
+            type: 'datetime',
+            dateTimeLabelFormats: {
+                day: '%e of %b'
+            }
+        },
+        yAxis: {
+            title: {
+                text: null
+            }
+        },
+        tooltip: {
+            valueSuffix: ' times'
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            borderWidth: 0
+        }
+    };
+
+    $http({
+        method: 'GET',
+        url: '/api/breakdown',
+        params: {
+            entries: "crude oil,natural gas,gold,silver"
+        }
+    }).then(function (response) {        
+        options.series = processBreakdownData(response.data);
+        $('#breakdown-container').highcharts(options);
+    });
+
+}
+
+
+function processBreakdownData(response) {
+    var entries = response.entries;
+    var series = [];
+    var counter = 0;
+    var calculated = [];
+
+    for (var i= 0; i< entries.length; i++){
+        var entryName = entries[i].entryName;
+        if (calculated.indexOf(entryName) == -1) {
+            var counts = [];    
+            for (var j= 0; j< entries.length; j++){            
+                if (entries[j].entryName == entryName && i != j) {            
+                    for (var z = 0; z<entries[j].counts.length; z++){
+                        if (entries[j].sentiment == 'positive'){
+                        counts[z] = Math.log((entries[j].counts[z] + 1) / (entries[i].counts[z] + 1));
+
+                        } else {
+                            counts[z] = Math.log((entries[i].counts[z] + 1) / (entries[j].counts[z] + 1));
+                        }
+                    
+                    }
+                }
+            }
+
+            calculated.push(entryName);
+
+            series.push({
+                name: entryName,
+                data: counts
+            });
+
+        }
+        
+
+    }
+    return series;
+
 }
