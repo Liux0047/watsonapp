@@ -1,6 +1,7 @@
 function assetClassService() {
     var _assetClass;
     var ASSET_CLASS_COMMODITY = 'commodity';
+    var ASSET_CLASS_EQUITY = 'emerging%20markets';
 
     var getProductCode = function () {
         var url = '' + ((window.location != window.parent.location)
@@ -20,9 +21,12 @@ function assetClassService() {
         switch (portfolioCode) {
             case '270319':
                 _assetClass = ASSET_CLASS_COMMODITY;
+            case '239637':
+                _assetClass = ASSET_CLASS_EQUITY;
+                break;
             default:
                 // randomly assign a class for local testing
-                _assetClass = ASSET_CLASS_COMMODITY;
+                _assetClass = ASSET_CLASS_EQUITY;
         }
         return _assetClass;
     };
@@ -31,6 +35,8 @@ function assetClassService() {
         switch (_assetClass) {
             case ASSET_CLASS_COMMODITY:
                 return 'crude oil,natural gas,gold,silver';
+            case ASSET_CLASS_EQUITY:
+                return 'China,South Korea,Taiwan,India';
             default:
                 return '';
         }
