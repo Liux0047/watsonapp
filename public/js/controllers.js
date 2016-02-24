@@ -32,9 +32,8 @@ function sentimentController($http, assetClassService) {
      */
 }
 
-function keywordsController($scope, $http, $location, assetClassService) {
-    var assetClass = ($location.search()).assetClass;
-    assetClassService.setAssetClass(assetClass);
+function keywordsController($scope, $http, assetClassService) {
+    var assetClass = assetClassService.getAssetClass();
     var updateLinks = function (links) {
         $scope.$apply(function () {
             $scope.links = links;
