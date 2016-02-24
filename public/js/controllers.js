@@ -14,13 +14,14 @@ function MainCtrl() {
 
 };
 
+
 angular
     .module('watsonapp')
     .controller('MainCtrl', MainCtrl);
 
 
-function sentimentController($scope, $http) {
-    getSentiment($http);
+function sentimentController($http, assetClassService) {
+    getSentiment($http, assetClassService.getAssetClass());
     /*
      $('#top-search').keyup(function (event) {
      if (event.keyCode == 13) {
@@ -31,23 +32,25 @@ function sentimentController($scope, $http) {
      */
 }
 
-function keywordsController($scope, $http) {
+function keywordsController($scope, $http, $location, assetClassService) {
+    var assetClass = ($location.search()).assetClass;
+    assetClassService.setAssetClass(assetClass);
     var updateLinks = function (links) {
         $scope.$apply(function () {
             $scope.links = links;
             console.log($scope.links);
         });
     }
-    getKeywords($http, updateLinks);
+    getKeywords($http, updateLinks, assetClass);
 }
 
 
-function breakdownController($scope, $http) {
-    getBreakdown($http);
+function breakdownController($http, assetClassService) {
+    getBreakdown($http, assetClassService);
 }
 
-function getSentiment($http) {
-    var input = "commodity";
+function getSentiment($http, assetClass) {
+    var input = assetClass;
     if (input.length) {
 
         var options = {
@@ -114,8 +117,8 @@ function getSentiment($http) {
     }
 }
 
-function getKeywords($http, updateLinks) {
-    var entityName = "commodity";
+function getKeywords($http, updateLinks, assetClass) {
+    var entityName = assetClass;
     var entitiesWrapper = {};
 
     if (entityName.length) {
@@ -265,7 +268,7 @@ function processKeywordsData(rawResponse, entitiesWrapper) {
 }
 
 
-function getBreakdown($http) {
+function getBreakdown($http, assetClassService) {
 
     var options = {
         title: {
@@ -308,7 +311,7 @@ function getBreakdown($http) {
         method: 'GET',
         url: '/api/breakdown',
         params: {
-            entries: "crude oil,natural gas,gold,silver"
+            entries: assetClassService.getAssetClassBreakdown()
         }
     }).then(function (response) {
         options.series = processBreakdownData(response.data);
