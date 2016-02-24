@@ -98,7 +98,7 @@ function getSentiment($http, assetClass) {
                     options.series.push({
                         name: 'Positive',
                         data: response.positiveCounts.result.slices,
-                        pointStart: (new Date()).getTime() - 24 * 60 * 3600,
+                        pointStart: (new Date()).getTime() - 24 * 60 * 3600 * 1000,
                         pointInterval: 24 * 3600 * 1000 // one day
                     });
                 }
@@ -107,7 +107,7 @@ function getSentiment($http, assetClass) {
                     options.series.push({
                         name: 'Negative',
                         data: response.negativeCounts.result.slices,
-                        pointStart: (new Date()).getTime() - 24 * 60 * 3600,
+                        pointStart: (new Date()).getTime() - 24 * 60 * 3600 * 1000,
                         pointInterval: 24 * 3600 * 1000 // one day
                     });
                 }
@@ -284,7 +284,7 @@ function getBreakdown($http, assetClassService) {
         },
         xAxis: {
             title: {
-                text: 'Date time'
+                text: 'Date Time'
             },
             type: 'datetime',
             dateTimeLabelFormats: {
@@ -347,7 +347,9 @@ function processBreakdownData(response) {
 
             series.push({
                 name: entryName,
-                data: counts
+                data: counts,
+                pointStart: (new Date()).getTime() - 24 * 14 * 3600 * 1000,
+                pointInterval: 24 * 3600 * 1000
             });
 
         }
