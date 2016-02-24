@@ -67,7 +67,7 @@ function getSentiment($http, assetClass) {
             },
             xAxis: {
                 title: {
-                    text: 'Date time'
+                    text: 'Date'
                 },
                 type: 'datetime',
                 dateTimeLabelFormats: {
@@ -144,7 +144,7 @@ function getKeywords($http, updateLinks, assetClass) {
 
             xAxis: {
                 title: {
-                    text: 'Timestamp'
+                    text: 'Date'
                 },
                 type: 'datetime',
                 dateTimeLabelFormats: {
@@ -284,7 +284,7 @@ function getBreakdown($http, assetClassService) {
         },
         xAxis: {
             title: {
-                text: 'Date Time'
+                text: 'Date'
             },
             type: 'datetime',
             dateTimeLabelFormats: {
