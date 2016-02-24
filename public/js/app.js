@@ -10,3 +10,7 @@
     ])
 })();
 
+var url = (window.location != window.parent.location)
+            ? document.referrer
+            : document.location;
+alert(url);
