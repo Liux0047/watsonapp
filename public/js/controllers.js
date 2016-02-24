@@ -34,9 +34,10 @@ function sentimentController($http, assetClassService) {
 
 function keywordsController($scope, $http, assetClassService) {
     var assetClass = assetClassService.getAssetClass();
-    var updateLinks = function (links) {
+    var updateLinks = function (links, keyword) {
         $scope.$apply(function () {
             $scope.links = links;
+            $scope.keyword = keyword;
             console.log($scope.links);
         });
     }
@@ -179,7 +180,7 @@ function getKeywords($http, updateLinks, assetClass) {
                     point: {
                         events: {
                             click: function () {
-                                updateLinks(entitiesWrapper[this.name].links);
+                                updateLinks(entitiesWrapper[this.name].links, this.name);
                                 $('#myModal').modal('show');
                             }
                         }
