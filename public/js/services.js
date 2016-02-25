@@ -26,7 +26,7 @@ function assetClassService() {
                 break;
             default:
                 // randomly assign a class for local testing
-                _assetClass = ASSET_CLASS_EQUITY;
+                _assetClass = ASSET_CLASS_COMMODITY;
         }
         return _assetClass;
     };
@@ -39,6 +39,29 @@ function assetClassService() {
                 return 'China,South Korea,Taiwan,India';
             default:
                 return '';
+        }
+    };
+
+    this.getBreakdownPriceIndicator = function () {
+        switch (_assetClass) {
+            case ASSET_CLASS_COMMODITY:
+                return {
+                    name: 'WTI Crude Oil',
+                    type: 'spline',
+                    data: [26.21, 29.44, 29.44, 29.44, 29.44, 29.04, 30.66, 30.77, 29.64, 29.64, 29.64, 31.48, 31.87, 32.26],
+                    yAxis: 1,
+                    visible: false
+                };
+            case ASSET_CLASS_EQUITY:
+                return {
+                    name: 'China ETF',
+                    type: 'spline',
+                    data: [],
+                    yAxis: 1,
+                    visible: false
+                };
+            default:
+                return {};
         }
     };
 }

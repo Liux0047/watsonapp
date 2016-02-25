@@ -267,6 +267,15 @@ function processKeywordsData(rawResponse, entitiesWrapper) {
     return result;
 }
 
+var getDateCategories = function () {
+    var now = new Date();
+    var categories = [];
+    for (var i = 14; i > 0; i--) {
+        var dateStr = moment(new Date(now.getTime() - 24 * i * 3600 * 1000)).format('D MMM');
+        categories.push(dateStr);
+    }
+    return categories;
+};
 
 function getBreakdown($http, assetClassService) {
 
@@ -282,20 +291,28 @@ function getBreakdown($http, assetClassService) {
         chart: {
             zoomType: 'x'
         },
-        xAxis: {
+        xAxis: [{
             title: {
                 text: 'Date'
             },
-            type: 'datetime',
-            dateTimeLabelFormats: {
-                day: '%e of %b'
-            }
-        },
-        yAxis: {
+            categories: getDateCategories()
+        }],
+        yAxis: [{ // primary yAxis
             title: {
-                text: null
+                text: 'Sentiment Index'
+            },
+            labels: {
+                format: '{value}'
             }
-        },
+        }, {
+            title: {
+                text: 'Price Indicator'
+            },
+            labels: {
+                format: '{value}'
+            },
+            opposite: true
+        }],
         tooltip: {
             valueSuffix: ' times'
         },
@@ -314,14 +331,14 @@ function getBreakdown($http, assetClassService) {
             entries: assetClassService.getAssetClassBreakdown()
         }
     }).then(function (response) {
-        options.series = processBreakdownData(response.data);
+        options.series = processBreakdownData(response.data, assetClassService);
         $('#breakdown-container').highcharts(options);
     });
 
 }
 
 
-function processBreakdownData(response) {
+function processBreakdownData(response, assetClassSerivce) {
     var entries = response.entries;
     var series = [];
     var calculated = [];
@@ -348,14 +365,13 @@ function processBreakdownData(response) {
             series.push({
                 name: entryName,
                 data: counts,
-                pointStart: (new Date()).getTime() - 24 * 14 * 3600 * 1000,
-                pointInterval: 24 * 3600 * 1000
+                type: 'spline',
+                yAxis: 0
             });
-
         }
-
-
     }
-    return series;
 
+    // add WTI Crude Oil Price
+    series.push(assetClassSerivce.getBreakdownPriceIndicator());
+    return series;
 }
