@@ -161,6 +161,10 @@ function getKeywords($http, updateLinks, assetClass) {
                 text: 'Related Keywords'
             },
 
+            subtitle: {
+                text: 'This graph shows the relevant keywords for this ETF. y-Axis is the average sentiment for that keyword. x-Axis is the time when it was lastly mentioned. Size of the bubble denotes its relevancy to this ETF'
+            },
+
             xAxis: {
                 title: {
                     text: 'Date'
@@ -292,6 +296,9 @@ function getBreakdown($http, assetClassService) {
         title: {
             text: 'Breakdown Sentiment Analysis',
             x: -20 //center
+        },
+        subtitle: {
+            text: 'This graph shows the sentiment curve for major factors of this ETF '
         },
         chart: {
             zoomType: 'x'
