@@ -9,7 +9,9 @@
     <div id="page-wrapper" class="gray-bg {{$state.current.name}}">
         
         <!-- Main view  -->
-        <div ui-view></div>
+        <div class="wrapper wrapper-content">
+            <div ui-view></div>
+        </div>
 
         <!-- Footer -->
         <div ng-include="'views/common/footer.html'"></div>
