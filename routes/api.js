@@ -97,7 +97,7 @@ router.get('/breakdown', function (req, res, next) {
                 'sentiment': sentiments[z]
             };
 
-            doAjax(buildBreakdownUrl(entries[i], sentiments[z], numEntries), function (result, callbackParams) {
+            doAjax(buildBreakdownUrl(entries[i], sentiments[z], options), function (result, callbackParams) {
                 var positiveCounts = result;
                 var entry = {
                     entryName: callbackParams.entry,
@@ -113,6 +113,31 @@ router.get('/breakdown', function (req, res, next) {
 
 });
 
+
+router.get('/mentions', function (req, res, next) {
+    var entityNames = req.query.entityNames.split(",");
+    var responseCounter = 0;
+    responseData = {
+        entries: []
+    }
+    for (var i = 0; i < entityNames.length; i++) {        
+        var callbackParams = {
+            'entryName': entityNames[i]
+        }
+        doAjax(buildMentionsUrl(entityNames[i]), function (result, callbackParams) {
+            var entry = {
+                'entryName': callbackParams.entryName,
+                'mentions': result
+            }
+            console.log(entry.entryName);
+            responseData.entries.push(entry);
+            sendAsyncResponse(++responseCounter, entityNames.length, res, responseData);
+        },callbackParams);
+    }
+
+});
+
+
 router.get('/headlines', function (req, res, next) {
     var options = {
         start: req.query.start,
@@ -120,8 +145,6 @@ router.get('/headlines', function (req, res, next) {
         searchText: req.query.searchText,
         count: req.query.count
     };
-
-    var responseData = {};
 
     doAjax(buildHeadlinesUrl(options), function (result) {
         res.json(result);
@@ -196,12 +219,22 @@ function buildHeadlinesUrl(options) {
     return url;
 }
 
+function buildMentionsUrl(entityName) {
+    var url = gateway + 'count=5&start=now-30d&end=now&' +
+    'q.enriched.url.taxonomy.taxonomy_.label=[business%20and%20industrial^finance]&' +
+    'q.enriched.url.relations.relation.subject.entities.entity.text=' + entityName + '&' +
+    'q.enriched.url.relations.relation.object.entities.entity.text=' + entityName + '&' +
+    'return=enriched.url.url,enriched.url.title,q.enriched.url.relations.relation.sentence&' +
+    'dedup=1&apikey=' + CONFIG.WATSON_API_KEY;
+    return url;
+}
 
 function sendAsyncResponse(counter, threshold, res, responseData) {
     if (counter >= threshold) {
         res.json(responseData);
     }
 }
+
 
 
 

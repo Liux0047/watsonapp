@@ -30,7 +30,6 @@ function keywordsController($scope, $http, assetClassService) {
         $scope.$apply(function () {
             $scope.links = links;
             $scope.keyword = keyword;
-            console.log($scope.links);
         });
     }
     getKeywords($http, updateLinks, assetClass);
@@ -38,7 +37,7 @@ function keywordsController($scope, $http, assetClassService) {
 
 
 function breakdownController($http, assetClassService) {
-    getBreakdown($http, assetClassService);
+    getBreakdown($http, assetClassService);    
 }
 
 
@@ -50,6 +49,16 @@ function headlinesController($scope, $http, assetClassService) {
     getHeadlines($http, assetClassService.getAssetClass(), updateHeadlines);
 }
 
+function mentionsController($scope, $http, assetClassService){
+    var entityNames = assetClassService.getAssetClassBreakdown();
+    $scope.entityNames = entityNames;
+    var updateMentions = function (mentions) {
+        $scope.mentions = mentions;
+        setTimeout(initCollapseLink, 1000);
+    }
+    getMentions($http, entityNames, updateMentions);
+        
+}
 
 function getSentiment($http, assetClass) {
     var input = assetClass;
@@ -59,10 +68,6 @@ function getSentiment($http, assetClass) {
             title: {
                 text: 'Sentiment Analysis',
                 x: -20 //center
-            },
-            subtitle: {
-                text: 'Source: ibm.com',
-                x: -20
             },
             chart: {
                 zoomType: 'x'
@@ -157,7 +162,7 @@ function getKeywords($http, updateLinks, assetClass) {
             },
 
             subtitle: {
-                text: 'Source: <a href="http://www.euromonitor.com/">Euromonitor</a> and <a href="https://data.oecd.org/">OECD</a>'
+                text: 'This graph shows the relevant keywords for this ETF. y-Axis is the average sentiment for that keyword. x-Axis is the time when it was lastly mentioned. Size of the bubble denotes its relevancy to this ETF'
             },
 
             xAxis: {
@@ -296,15 +301,13 @@ var getDateCategories = function () {
 };
 
 function getBreakdown($http, assetClassService) {
-
     var options = {
         title: {
             text: 'Breakdown Sentiment Analysis',
             x: -20 //center
         },
         subtitle: {
-            text: 'Source: ibm.com',
-            x: -20
+            text: 'This graph shows the sentiment curve for major factors of this ETF '
         },
         chart: {
             zoomType: 'x'
@@ -353,6 +356,49 @@ function getBreakdown($http, assetClassService) {
         $('#breakdown-container').highcharts(options);
     });
 
+}
+
+function getMentions($http, entityNames, updateMentions){
+    if (entityNames.length) {
+
+        $http({
+            method: 'GET',
+            url: '/api/mentions',
+            params: {
+                entityNames: entityNames
+            }
+        }).then(function (response) {  
+            response = response.data;
+            var mentions = [];
+            for (var entryIndex=0; entryIndex<response.entries.length; entryIndex++){
+                var validSentences = [];
+                var mention = {
+                    'entryName': response.entries[entryIndex].entryName,
+                    'sentences': []
+                };
+
+                var docs = response.entries[entryIndex].mentions.result.docs;
+                
+                for (var i=0; i<docs.length; i++) {
+                    var doc = docs[i].source.enriched.url;
+                    for (var j=0; j<doc.relations.length; j++){
+                        var sentence = doc.relations[j].sentence;
+                        if (sentence.indexOf(mention.entryName) > -1) {
+                            mention.sentences.push({
+                                'url': doc.url,
+                                'title': doc.title,
+                                'sentence': sentence
+                            });
+                            break;
+                        }
+                    }
+                }
+
+                mentions.push(mention);
+            }
+            updateMentions(mentions);  
+        });
+    }
 }
 
 
