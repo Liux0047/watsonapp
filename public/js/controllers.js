@@ -20,18 +20,20 @@ angular
     .controller('MainCtrl', MainCtrl);
 
 
-function sentimentController($http, assetClassService) {
+function sentimentController($scope, $http, assetClassService) {
+    $scope.assetClass = assetClassService.getAssetClass();
     getSentiment($http, assetClassService.getAssetClass());
 }
 
 function keywordsController($scope, $http, assetClassService) {
     var assetClass = assetClassService.getAssetClass();
+    $scope.assetClass = assetClass;
     var updateLinks = function (links, keyword) {
         $scope.$apply(function () {
             $scope.links = links;
             $scope.keyword = keyword;
         });
-    }
+    };
     getKeywords($http, updateLinks, assetClass);
 }
 
@@ -45,7 +47,8 @@ function headlinesController($scope, $http, assetClassService) {
     var updateHeadlines = function (headlines) {
         $scope.headlines = headlines;
         $scope.now = (new Date()).getTime();
-    }
+    };
+    $scope.assetClass = assetClassService.getAssetClass();
     getHeadlines($http, assetClassService.getAssetClass(), updateHeadlines);
 }
 
@@ -55,7 +58,7 @@ function mentionsController($scope, $http, assetClassService){
     var updateMentions = function (mentions) {
         $scope.mentions = mentions;
         setTimeout(initCollapseLink, 1000);
-    }
+    };
     getMentions($http, entityNames, updateMentions);
         
 }
@@ -429,7 +432,6 @@ function processBreakdownData(response, assetClassSerivce) {
             series.push({
                 name: entryName,
                 data: counts,
-                type: 'spline',
                 yAxis: 0
             });
         }

@@ -6,17 +6,27 @@
                         class="nav-label">Related Keywords</span></a>
             </li>
             <li ui-sref-active="active">
+                <a ui-sref="index.headlines"><i class="fa fa-newspaper-o"></i> <span
+                        class="nav-label">Trendy Headlines</span></a>
+            </li>
+            <li ui-sref-active="active">
                 <a ui-sref="index.sentiment"><i class="fa fa-bar-chart-o"></i> <span class="nav-label">Sentiment Analysis</span></a>
             </li>
             <li ui-sref-active="active">
-                <a ui-sref="index.breakdown"><i class="fa fa-sitemap"></i> <span class="nav-label">Factor Breakdown</span></a>
-            </li>
-            <li ui-sref-active="active">
-                <a ui-sref="index.headlines"><i class="fa fa-newspaper-o"></i> <span class="nav-label">Trendy Headlines</span></a>
-            </li>            
-            <li ui-sref-active="active">
-                <a ui-sref="index.mentions"><i class="fa fa-at"></i> <span class="nav-label">Recent Mentions</span></a>
-            </li>
+                <a href="#">
+                    <i class="fa fa-th-large"></i> <span class="nav-label">Factor Breakdown</span> <span
+                        class="fa arrow"></span>
+                </a>
+                <ul class="nav nav-second-level">
+                    <li ui-sref-active="active">
+                        <a ui-sref="index.breakdown"><i class="fa fa-sitemap"></i> <span class="nav-label">Factor Sentiments</span></a>
+                    </li>
+
+                    <li ui-sref-active="active">
+                        <a ui-sref="index.mentions"><i class="fa fa-at"></i> <span
+                                class="nav-label">Recent Mentions</span></a>
+                    </li>
+                </ul>
         </ul>
 
     </div>
