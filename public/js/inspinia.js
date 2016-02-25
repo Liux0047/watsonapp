@@ -33,8 +33,6 @@ $(document).ready(function () {
     // MetsiMenu
     $('#side-menu').metisMenu();
 
-    initCollapseLink();
-
     // Close ibox function
     $('.close-link').click(function () {
         var content = $(this).closest('div.ibox');

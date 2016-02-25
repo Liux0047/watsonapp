@@ -21,6 +21,7 @@ function assetClassService() {
         switch (portfolioCode) {
             case '270319':
                 _assetClass = ASSET_CLASS_COMMODITY;
+                break;
             case '239637':
                 _assetClass = ASSET_CLASS_EQUITY;
                 break;

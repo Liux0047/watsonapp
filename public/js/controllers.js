@@ -54,7 +54,7 @@ function mentionsController($scope, $http, assetClassService){
     $scope.entityNames = entityNames;
     var updateMentions = function (mentions) {
         $scope.mentions = mentions;
-        initCollapseLink();
+        setTimeout(initCollapseLink, 1000);
     }
     getMentions($http, entityNames, updateMentions);
         
@@ -372,7 +372,6 @@ function getMentions($http, entityNames, updateMentions){
 
                 mentions.push(mention);
             }
-            console.debug(mentions);
             updateMentions(mentions);  
         });
     }
