@@ -22,14 +22,6 @@ angular
 
 function sentimentController($http, assetClassService) {
     getSentiment($http, assetClassService.getAssetClass());
-    /*
-     $('#top-search').keyup(function (event) {
-     if (event.keyCode == 13) {
-     event.preventDefault();
-     getSentiment($http);
-     }
-     });
-     */
 }
 
 function keywordsController($scope, $http, assetClassService) {
@@ -48,6 +40,16 @@ function keywordsController($scope, $http, assetClassService) {
 function breakdownController($http, assetClassService) {
     getBreakdown($http, assetClassService);
 }
+
+
+function headlinesController($scope, $http, assetClassService) {
+    var updateHeadlines = function (headlines) {
+        $scope.headlines = headlines;
+        $scope.now = (new Date()).getTime();
+    }
+    getHeadlines($http, assetClassService.getAssetClass(), updateHeadlines);
+}
+
 
 function getSentiment($http, assetClass) {
     var input = assetClass;
@@ -116,6 +118,22 @@ function getSentiment($http, assetClass) {
             });
     }
 }
+
+function getHeadlines($http, assetClass, updateHeadlines) {
+    var input = assetClass;
+    if (input.length) {
+
+        $http.get("/api/headlines?searchText=" + input + "&count=5")
+            .then(function (response) {                
+                response = response.data;
+                if (response.status == "OK") {
+                    updateHeadlines(response.result.docs);
+                }
+
+            });
+    }
+}
+
 
 function getKeywords($http, updateLinks, assetClass) {
     var entityName = assetClass;

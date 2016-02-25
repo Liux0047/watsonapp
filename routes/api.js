@@ -113,6 +113,21 @@ router.get('/breakdown', function (req, res, next) {
 
 });
 
+router.get('/headlines', function (req, res, next) {
+    var options = {
+        start: req.query.start,
+        end: req.query.end,
+        searchText: req.query.searchText,
+        count: req.query.count
+    };
+
+    var responseData = {};
+
+    doAjax(buildHeadlinesUrl(options), function (result) {
+        res.json(result);
+    });
+});
+
 module.exports = router;
 
 function doAjax(url, callback, callbackParams) {
@@ -167,6 +182,17 @@ function buildBreakdownUrl(entry, sentiment, options) {
         'q.enriched.url.entities.entity=|text=' + entry + ',relevance=>0.8,sentiment.type=' + sentiment + '|&' +
         'q.enriched.url.taxonomy.taxonomy_.label=[business%20and%20industrial^finance]&' +
         'apikey=' + CONFIG.WATSON_API_KEY;
+    return url;
+}
+
+function buildHeadlinesUrl(options) {
+    var returnParams = enriched + 'url,' + enriched + 'title,' + enriched + 'text';
+    var url = gateway + 'start=now-14d&end=now&count=' + options.count + "&" +
+        'q.enriched.url.entities.entity=|text=' + options.searchText + ',relevance=>0.8|&' +
+        'q.enriched.url.taxonomy.taxonomy_.label=[business%20and%20industrial^finance]&' +
+        'return=' + returnParams + "&" +
+        'apikey=' + CONFIG.WATSON_API_KEY;
+    console.log(url);
     return url;
 }
 
