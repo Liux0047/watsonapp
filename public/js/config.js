@@ -36,8 +36,14 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         .state('index.breakdown', {
             url: "/breakdown",
             templateUrl: "views/breakdown.html",
-            data: {pageTitle: 'Breakdown'},
+            data: {pageTitle: 'Factor Breakdown'},
             controller: breakdownController
+        })        
+        .state('index.headlines', {
+            url: "/headlines",
+            templateUrl: "views/headlines.html",
+            data: {pageTitle: 'Trendy Headlines'},
+            controller: headlinesController
         })
 }
 angular

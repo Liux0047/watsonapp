@@ -1,0 +1,39 @@
+<div class="animated fadeInRight">
+	<div class="row">		
+		<div class="col-lg-12">
+			<div class="ibox float-e-margins">
+				<div class="ibox-title">
+					<h5>Trendy Headlines</h5>
+					<div class="ibox-tools">
+						<a class="collapse-link">
+							<i class="fa fa-chevron-up"></i>
+						</a>
+						<a class="close-link">
+							<i class="fa fa-times"></i>
+						</a>
+					</div>
+				</div>
+				<div class="ibox-content">
+					<div class="feed-activity-list">
+						<div class="feed-element" ng-repeat="doc in headlines">
+							<div>
+								<small class="pull-right text-navy">
+									{{ ( now - doc.timestamp*1000) / 3600000 | number:0 }} hours ago
+								</small>
+								<strong>
+									<a href="{{ doc.source.enriched.url.url }}" target="_blank">
+										{{ doc.source.enriched.url.title }}
+									</a>
+								</strong>
+								<div>
+									{{ doc.source.enriched.url.text }}
+								</div>
+								<small class="text-muted">{{ doc.timestamp * 1000 | date:'medium' }}</small>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
