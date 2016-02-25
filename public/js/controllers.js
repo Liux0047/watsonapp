@@ -30,7 +30,6 @@ function keywordsController($scope, $http, assetClassService) {
         $scope.$apply(function () {
             $scope.links = links;
             $scope.keyword = keyword;
-            console.log($scope.links);
         });
     }
     getKeywords($http, updateLinks, assetClass);
@@ -38,7 +37,7 @@ function keywordsController($scope, $http, assetClassService) {
 
 
 function breakdownController($http, assetClassService) {
-    getBreakdown($http, assetClassService);
+    getBreakdown($http, assetClassService);    
 }
 
 
@@ -50,6 +49,17 @@ function headlinesController($scope, $http, assetClassService) {
     getHeadlines($http, assetClassService.getAssetClass(), updateHeadlines);
 }
 
+function mentionsController($scope, $http, assetClassService){
+    var entityNames = assetClassService.getAssetClassBreakdown();
+    $scope.entityNames = entityNames;
+    var updateMentions = function (mentionsTexts) {
+        $scope.mentions = mentionsTexts;
+    }
+    getMentions($http, entityNames, updateMentions);
+    
+    initCollapseLink();   
+        
+}
 
 function getSentiment($http, assetClass) {
     var input = assetClass;
@@ -59,10 +69,6 @@ function getSentiment($http, assetClass) {
             title: {
                 text: 'Sentiment Analysis',
                 x: -20 //center
-            },
-            subtitle: {
-                text: 'Source: ibm.com',
-                x: -20
             },
             chart: {
                 zoomType: 'x'
@@ -154,10 +160,6 @@ function getKeywords($http, updateLinks, assetClass) {
 
             title: {
                 text: 'Related Keywords'
-            },
-
-            subtitle: {
-                text: 'Source: <a href="http://www.euromonitor.com/">Euromonitor</a> and <a href="https://data.oecd.org/">OECD</a>'
             },
 
             xAxis: {
@@ -287,15 +289,10 @@ function processKeywordsData(rawResponse, entitiesWrapper) {
 
 
 function getBreakdown($http, assetClassService) {
-
     var options = {
         title: {
             text: 'Breakdown Sentiment Analysis',
             x: -20 //center
-        },
-        subtitle: {
-            text: 'Source: ibm.com',
-            x: -20
         },
         chart: {
             zoomType: 'x'
@@ -336,6 +333,50 @@ function getBreakdown($http, assetClassService) {
         $('#breakdown-container').highcharts(options);
     });
 
+}
+
+function getMentions($http, entityNames, updateMentions){
+    if (entityNames.length) {
+
+        $http({
+            method: 'GET',
+            url: '/api/mentions',
+            params: {
+                entityNames: entityNames
+            }
+        }).then(function (response) {  
+            response = response.data;
+            var mentions = [];
+            for (var entryIndex=0; entryIndex<response.entries.length; entryIndex++){
+                var validSentences = [];
+                var mention = {
+                    'entryName': response.entries[entryIndex].entryName,
+                    'sentences': []
+                };
+
+                var docs = response.entries[entryIndex].mentions.result.docs;
+                console.debug(docs);
+                for (var i=0; i<docs.length; i++) {
+                    var doc = docs[i].source.enriched.url;
+                    for (var j=0; j<doc.relations.length; j++){
+                        var sentence = doc.relations[j].sentence;
+                        if (sentence.indexOf(mention.entryName) > -1 && validSentences.indexOf(sentence) == -1) {
+                            mention.sentences.push({
+                                'url': doc.url,
+                                'title': doc.title,
+                                'sentence': sentence
+                            });
+                            validSentences.push(sentence);
+                        }
+                    }
+                }
+
+                mentions.push(mention);
+            }
+            console.debug(mentions);
+            updateMentions(mentions);  
+        });
+    }
 }
 
 
