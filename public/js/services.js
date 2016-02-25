@@ -1,7 +1,7 @@
 function assetClassService() {
     var _assetClass;
     var ASSET_CLASS_COMMODITY = 'commodity';
-    var ASSET_CLASS_EQUITY = 'emerging%20markets';
+    var ASSET_CLASS_EQUITY = 'clean%20energy';
 
     var getProductCode = function () {
         var url = '' + ((window.location != window.parent.location)
@@ -37,7 +37,7 @@ function assetClassService() {
             case ASSET_CLASS_COMMODITY:
                 return 'crude oil,natural gas,gold,silver';
             case ASSET_CLASS_EQUITY:
-                return 'China,South Korea,Taiwan,India';
+                return 'solar energy,wind power,hydropower,geothermal';
             default:
                 return '';
         }

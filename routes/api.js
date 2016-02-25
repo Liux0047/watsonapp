@@ -220,7 +220,7 @@ function buildHeadlinesUrl(options) {
 }
 
 function buildMentionsUrl(entityName) {
-    var url = gateway + 'count=5&start=now-1d&end=now&' +
+    var url = gateway + 'count=5&start=now-30d&end=now&' +
     'q.enriched.url.taxonomy.taxonomy_.label=[business%20and%20industrial^finance]&' +
     'q.enriched.url.relations.relation.subject.entities.entity.text=' + entityName + '&' +
     'q.enriched.url.relations.relation.object.entities.entity.text=' + entityName + '&' +
