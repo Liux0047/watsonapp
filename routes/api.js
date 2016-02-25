@@ -225,7 +225,7 @@ function buildMentionsUrl(entityName) {
     'q.enriched.url.relations.relation.subject.entities.entity.text=' + entityName + '&' +
     'q.enriched.url.relations.relation.object.entities.entity.text=' + entityName + '&' +
     'return=enriched.url.url,enriched.url.title,q.enriched.url.relations.relation.sentence&' +
-    'apikey=' + CONFIG.WATSON_API_KEY;
+    'dedup=1&apikey=' + CONFIG.WATSON_API_KEY;
     return url;
 }
 

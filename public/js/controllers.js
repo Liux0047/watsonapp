@@ -52,12 +52,11 @@ function headlinesController($scope, $http, assetClassService) {
 function mentionsController($scope, $http, assetClassService){
     var entityNames = assetClassService.getAssetClassBreakdown();
     $scope.entityNames = entityNames;
-    var updateMentions = function (mentionsTexts) {
-        $scope.mentions = mentionsTexts;
+    var updateMentions = function (mentions) {
+        $scope.mentions = mentions;
+        initCollapseLink();
     }
     getMentions($http, entityNames, updateMentions);
-    
-    initCollapseLink();   
         
 }
 
@@ -355,18 +354,18 @@ function getMentions($http, entityNames, updateMentions){
                 };
 
                 var docs = response.entries[entryIndex].mentions.result.docs;
-                console.debug(docs);
+                
                 for (var i=0; i<docs.length; i++) {
                     var doc = docs[i].source.enriched.url;
                     for (var j=0; j<doc.relations.length; j++){
                         var sentence = doc.relations[j].sentence;
-                        if (sentence.indexOf(mention.entryName) > -1 && validSentences.indexOf(sentence) == -1) {
+                        if (sentence.indexOf(mention.entryName) > -1) {
                             mention.sentences.push({
                                 'url': doc.url,
                                 'title': doc.title,
                                 'sentence': sentence
                             });
-                            validSentences.push(sentence);
+                            break;
                         }
                     }
                 }
