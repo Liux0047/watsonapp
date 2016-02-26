@@ -21,6 +21,7 @@ angular
 
 
 function sentimentController($scope, $http, assetClassService) {
+    var assetClass = assetClassService.getAssetClass();
     $scope.assetClass = assetClassService.getAssetClass();
     getSentiment($http, assetClassService.getAssetClass());
 }
