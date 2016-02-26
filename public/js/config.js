@@ -7,7 +7,7 @@
  *
  */
 function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
-    $urlRouterProvider.otherwise("/index/keywords");
+    $urlRouterProvider.otherwise("/index/sentiment");
 
     $ocLazyLoadProvider.config({
         // Set to true if you want to see what and when is dynamically loaded
