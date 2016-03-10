@@ -1,3 +1,4 @@
+<![CDATA[
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet title="XSL_formatting" type="text/xsl" href="/shared/bsp/xsl/rss/nolsol.xsl"?>
 
@@ -25,3 +26,4 @@
     </item>  
       </channel> 
 </rss>
+]]>
