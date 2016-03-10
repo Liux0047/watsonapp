@@ -58,7 +58,7 @@ angular
     .filter('capitalize', function () {
         return function (input, scope) {
             if (input != null)
-                input = input.toLowerCase();
+                input = input.toLowerCase().replace('%20', ' ');
             return input.substring(0, 1).toUpperCase() + input.substring(1);
         }
     })

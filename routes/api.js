@@ -201,7 +201,7 @@ function buildKeywordsUrl(options) {
 }
 
 function buildBreakdownUrl(entry, sentiment, options) {
-    var url = gateway + 'start=now-30d&end=now&timeSlice=1d&' +
+    var url = gateway + 'start=now-14d&end=now&timeSlice=1d&' +
         'q.enriched.url.entities.entity=|text=' + entry + ',relevance=>0.8,sentiment.type=' + sentiment + '|&' +
         'q.enriched.url.taxonomy.taxonomy_.label=[business%20and%20industrial^finance]&' +
         'apikey=' + CONFIG.WATSON_API_KEY;
