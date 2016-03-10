@@ -19,7 +19,7 @@
       <link>http://www.fool.com/investing/general/2016/02/12/3-reasons-blackrock-stock-could-fall.aspx</link>  
       <guid isPermaLink="false">http://www.fool.com/investing/general/2016/02/12/3-reasons-blackrock-stock-could-fall.aspx</guid> 
 <image> 
-      <url>188.166.185.103:3000/picture1_tab1.JPG</url> 
+      <media:thumbnail width="66" height="49" url="http://c.files.bbci.co.uk/1425F/production/_88672528_breaking_image_large-3.png"/>
 </image>   
       <pubDate>Fri, 12 Feb 2016 05:29:20 GMT</pubDate> 
     </item>  
