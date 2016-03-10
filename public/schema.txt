@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet title="XSL_formatting" type="text/xsl" href="/shared/bsp/xsl/rss/nolsol.xsl"?>
+
+<rss xmlns:media="http://search.yahoo.com/mrss/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">  
+  <channel> 
+    <title>BLK News - Home</title> 
+    <description> Your BlackRock News Service</description>  
+    <language>en-gb</language>  
+      <image> 
+      <url>http://www.professionaladviser.com/IMG/366/289366/blackrock-logo-from-them-580x358.jpg?1456895915</url>  
+      <title>BBC News - Home</title>  
+      <link>https://www.blackrock.com/</link> 
+    </image>  
+    <ttl>15</ttl>  
+    <atom:link href="http://feeds.bbci.co.uk/news/rss.xml" rel="self" type="application/rss+xml"/>  
+    <item> 
+      <title>3 reasons BlackRock Stock could Fall</title>  
+      <description>Relentless price competition,the possibility that alpha can be fleeting,violent storm of lower asset values and sizable net outflows as investors flee the market - 3 key reasons that BlackRock needs to focus on to maintain their global market position</description>  
+      <link>http://www.fool.com/investing/general/2016/02/12/3-reasons-blackrock-stock-could-fall.aspx</link>  
+      <guid isPermaLink="false">http://www.fool.com/investing/general/2016/02/12/3-reasons-blackrock-stock-could-fall.aspx</guid> 
+<image> 
+      <url>188.166.185.103:3000/picture1_tab1.JPG</url> 
+</image>   
+      <pubDate>Fri, 12 Feb 2016 05:29:20 GMT</pubDate> 
+    </item>  
+      </channel> 
+</rss>
