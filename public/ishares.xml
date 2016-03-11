@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet title="XSL_formatting" type="text/xsl" href="/shared/bsp/xsl/rss/nolsol.xsl"?>
+
+<rss xmlns:media="http://search.yahoo.com/mrss/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">  
+  <channel> 
+    <title>BLK News - Home</title> 
+    <description> Your BlackRock News Service</description>  
+    <language>en-gb</language>  
+      <image> 
+      <url>http://www.professionaladviser.com/IMG/366/289366/blackrock-logo-from-them-580x358.jpg?1456895915</url>  
+      <title>BLK News - Home</title>  
+      <link>https://www.blackrock.com/</link> 
+    </image>  
+    <ttl>15</ttl>  
+    <atom:link href="http://feeds.bbci.co.uk/news/rss.xml" rel="self" type="application/rss+xml"/>  
+    <item> 
+      <title>iShares Select Dividend ETF Experiences Big Inflow</title>  
+      <description>Standout performer among iShares is the iShares Select Dividend ETF (Symbol: DVY) where we have detected an approximate $95.1 million dollar inflow -- that's a 0.7% increase week over week in outstanding units. The 200 Day Moving Average can give useful technical analysis options</description>  
+      <link>http://www.nasdaq.com/article/ishares-select-dividend-etf-experiences-big-inflow-cm590514</link>  
+      <guid isPermaLink="false">http://www.nasdaq.com/article/ishares-select-dividend-etf-experiences-big-inflow-cm590514</guid> 
+      <media:thumbnail width="66" height="49" url="188.166.185.103:3000/Ishares_1.JPG"/>   
+      <pubDate>Fri, 12 Feb 2016 05:29:20 GMT</pubDate> 
+    </item>
+<item> 
+      <title>iShares MSCI USA Minimum Volatility ETF weathering market storms consistently</title>  
+      <description>The rockiest U.S. stock swings in more than four years are prompting traders to pour record sums into a BlackRock Inc. exchange-traded fund that tracks companies considered more stable - USMV. While the S&P 500 has dropped this year, USMV hovers around a record and has gotten inflows almost every day. Its market cap has grown to more than $10 billion from $7.2 billion at the end of December. The ETF advanced 0.6 percent at 9:50 a.m. in New York.</description>  
+      <link>http://www.bloomberg.com/news/articles/2016-03-10/stock-swings-spur-record-flows-to-blackrock-volatility-haven-etf</link>  
+      <guid isPermaLink="false">http://www.bloomberg.com/news/articles/2016-03-10/stock-swings-spur-record-flows-to-blackrock-volatility-haven-etf</guid> 
+      <media:thumbnail width="66" height="49" url="188.166.185.103:3000/Ishares_2.JPG"/>   
+      <pubDate>Fri, 12 Feb 2016 05:29:20 GMT</pubDate> 
+    </item>
+      </channel> 
+</rss>
